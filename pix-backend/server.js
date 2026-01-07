@@ -3,6 +3,7 @@ import cors from "cors";
 import mercadopago from "mercadopago";
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 mercadopago.configure({
