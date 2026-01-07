@@ -3,9 +3,6 @@ import cors from "cors";
 import mercadopago from "mercadopago";
 
 const app = express();
-app.use(cors({
-  origin: "https://labiaaextrema.netlify.app"
-}));
 app.use(express.json());
 
 mercadopago.configure({
