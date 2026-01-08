@@ -2,28 +2,9 @@ import express from "express";
 import cors from "cors";
 import mercadopago from "mercadopago";
 
-let conteudoGlobal = "";
-
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
-
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-app.post("/conteudo", (req, res) => {
-  if (req.headers["x-admin-token"] !== ADMIN_TOKEN) {
-    return res.status(403).json({ error: "Não autorizado" });
-  }
-
-  const { texto } = req.body;
-  if (!texto) {
-    return res.status(400).json({ error: "Texto obrigatório" });
-  }
-
-  conteudoGlobal = texto;
-  res.json({ ok: true });
-});
-
 
 mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN
@@ -142,57 +123,6 @@ app.get("/retorno", async (req, res) => {
   }
 });
 */
-
-// SALVAR CONTEÚDO (ADMIN)
-app.post("/conteudo", (req, res) => {
-  if (req.headers["x-admin-token"] !== ADMIN_TOKEN) {
-    return res.status(403).json({ error: "Não autorizado" });
-  }
-
-  const { texto } = req.body;
-  if (!texto) {
-    return res.status(400).json({ error: "Texto obrigatório" });
-  }
-
-  fs.writeFileSync(
-    DATA_FILE,
-    JSON.stringify({ texto, atualizadoEm: Date.now() }, null, 2),
-    "utf-8"
-  );
-
-  res.json({ ok: true });
-});
-
-// LER CONTEÚDO (SITE)
-app.get("/conteudo", (req, res) => {
-  if (!fs.existsSync(DATA_FILE)) {
-    return res.json({ texto: "" });
-  }
-
-  app.get("/conteudo", (req, res) => {
-  res.json({ texto: conteudoGlobal });
-});
-
-// ===============================
-// CONTEÚDO GLOBAL (ADMIN / SITE)
-// ===============================
-
-// ADMIN salva conteúdo
-app.post("/admin/conteudo", (req, res) => {
-  const { texto } = req.body;
-
-  if (!texto) {
-    return res.status(400).json({ error: "Texto obrigatório" });
-  }
-
-  conteudoGlobal = texto;
-  res.json({ success: true });
-});
-
-// SITE lê conteúdo
-app.get("/conteudo", (req, res) => {
-  res.json({ texto: conteudoGlobal });
-});
 
 
 const PORT = process.env.PORT || 3000;
