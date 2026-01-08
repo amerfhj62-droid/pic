@@ -1,10 +1,24 @@
 import express from "express";
 import cors from "cors";
+import fs from "fs";
+import path from "path";
 import mercadopago from "mercadopago";
+
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+const DATA_FILE = path.resolve("/data/conteudo.json");
+
+if (!fs.existsSync(DATA_FILE)) {
+  fs.writeFileSync(
+    DATA_FILE,
+    JSON.stringify({ texto: "", atualizadoEm: Date.now() }, null, 2),
+    "utf-8"
+  );
+}
+
 
 mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN
@@ -123,6 +137,36 @@ app.get("/retorno", async (req, res) => {
   }
 });
 */
+
+// SALVAR CONTEÚDO (ADMIN)
+app.post("/conteudo", (req, res) => {
+  if (req.headers["x-admin-token"] !== ADMIN_TOKEN) {
+    return res.status(403).json({ error: "Não autorizado" });
+  }
+
+  const { texto } = req.body;
+  if (!texto) {
+    return res.status(400).json({ error: "Texto obrigatório" });
+  }
+
+  fs.writeFileSync(
+    DATA_FILE,
+    JSON.stringify({ texto, atualizadoEm: Date.now() }, null, 2),
+    "utf-8"
+  );
+
+  res.json({ ok: true });
+});
+
+// LER CONTEÚDO (SITE)
+app.get("/conteudo", (req, res) => {
+  if (!fs.existsSync(DATA_FILE)) {
+    return res.json({ texto: "" });
+  }
+
+  const data = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+  res.json(data);
+});
 
 
 const PORT = process.env.PORT || 3000;
