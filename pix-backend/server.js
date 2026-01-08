@@ -1,23 +1,28 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
-import path from "path";
 import mercadopago from "mercadopago";
+
+let conteudoGlobal = "";
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-const DATA_FILE = path.resolve("/data/conteudo.json");
 
-if (!fs.existsSync(DATA_FILE)) {
-  fs.writeFileSync(
-    DATA_FILE,
-    JSON.stringify({ texto: "", atualizadoEm: Date.now() }, null, 2),
-    "utf-8"
-  );
-}
+app.post("/conteudo", (req, res) => {
+  if (req.headers["x-admin-token"] !== ADMIN_TOKEN) {
+    return res.status(403).json({ error: "Não autorizado" });
+  }
+
+  const { texto } = req.body;
+  if (!texto) {
+    return res.status(400).json({ error: "Texto obrigatório" });
+  }
+
+  conteudoGlobal = texto;
+  res.json({ ok: true });
+});
 
 
 mercadopago.configure({
@@ -164,8 +169,29 @@ app.get("/conteudo", (req, res) => {
     return res.json({ texto: "" });
   }
 
-  const data = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
-  res.json(data);
+  app.get("/conteudo", (req, res) => {
+  res.json({ texto: conteudoGlobal });
+});
+
+// ===============================
+// CONTEÚDO GLOBAL (ADMIN / SITE)
+// ===============================
+
+// ADMIN salva conteúdo
+app.post("/admin/conteudo", (req, res) => {
+  const { texto } = req.body;
+
+  if (!texto) {
+    return res.status(400).json({ error: "Texto obrigatório" });
+  }
+
+  conteudoGlobal = texto;
+  res.json({ success: true });
+});
+
+// SITE lê conteúdo
+app.get("/conteudo", (req, res) => {
+  res.json({ texto: conteudoGlobal });
 });
 
 
