@@ -9,7 +9,48 @@ app.use(express.json());
 // ===============================
 // VARIÁVEIS
 // ===============================
-let conteudoGlobal = "";
+let conteudos = {};
+let metrics = {
+  visits: [],
+  vipUsers: 0,
+  totalTime: 0,
+  sessions: 0
+};
+
+app.post("/track", (req, res) => {
+  const { isVIP, timeSpent } = req.body;
+
+  metrics.visits.push({
+    date: new Date().toISOString().slice(0,10),
+    time: Date.now()
+  });
+
+  metrics.sessions++;
+  metrics.totalTime += timeSpent || 0;
+
+  if (isVIP) metrics.vipUsers++;
+
+  res.json({ ok: true });
+});
+
+app.get("/metrics", (req, res) => {
+  if (req.headers["x-admin-token"] !== process.env.ADMIN_TOKEN) {
+    return res.status(403).json({ error: "Não autorizado" });
+  }
+
+  const today = new Date().toISOString().slice(0,10);
+  const weekAgo = Date.now() - 7*86400000;
+
+  res.json({
+    total: metrics.visits.length,
+    today: metrics.visits.filter(v => v.date === today).length,
+    week: metrics.visits.filter(v => v.time >= weekAgo).length,
+    vip: metrics.vipUsers,
+    avgTime: metrics.sessions
+      ? Math.floor(metrics.totalTime / metrics.sessions)
+      : 0
+  });
+});
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
@@ -20,28 +61,25 @@ mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN
 });
 
-// ===============================
-// ADMIN → SALVAR CONTEÚDO
-// ===============================
+// ===== SALVAR CONTEÚDO POR TÓPICO (ADMIN)
 app.post("/conteudo", (req, res) => {
-  if (req.headers["x-admin-token"] !== ADMIN_TOKEN) {
+  if (req.headers["x-admin-token"] !== process.env.ADMIN_TOKEN) {
     return res.status(403).json({ error: "Não autorizado" });
   }
 
-  const { texto } = req.body;
-  if (!texto) {
-    return res.status(400).json({ error: "Texto obrigatório" });
+  const { topic, texto } = req.body;
+
+  if (topic === undefined || !texto) {
+    return res.status(400).json({ error: "Dados inválidos" });
   }
 
-  conteudoGlobal = texto;
+  conteudos[topic] = texto;
   res.json({ ok: true });
 });
 
-// ===============================
-// SITE → LER CONTEÚDO
-// ===============================
+// ===== LER CONTEÚDO (SITE)
 app.get("/conteudo", (req, res) => {
-  res.json({ texto: conteudoGlobal });
+  res.json({ messages: conteudos });
 });
 
 // ===============================
