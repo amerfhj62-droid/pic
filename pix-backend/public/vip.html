@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lábia Extrema • Bot</title>
+
+<style>
+*{box-sizing:border-box;font-family:system-ui,Arial}
+html, body{
+  margin:0;
+  padding:0;
+  height:100%;
+  background:#000;
+}
+
+/* MOBILE: ocupa a tela toda */
+body{
+  display:block;
+}
+
+.phone{
+  position:relative;
+  width:100%;
+  max-width:390px;
+  height:100svh; /* 🔥 remove o vão no celular */
+  background:#f2f2f2;
+  border-radius:16px;
+  box-shadow:0 20px 45px rgba(0,0,0,.35);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.header{
+  background:#b30000;
+  color:#fff;
+  padding:12px;
+}
+
+.title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:800;
+  font-size:18px;
+}
+
+.logo{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid #fff;
+}
+
+.sub{
+  font-size:12px;
+  margin-top:4px;
+  opacity:.9;
+}
+
+.messages{
+  flex:1;
+  padding:12px;
+  overflow-y:auto;
+}
+
+.msg{
+  max-width:78%;
+  margin-bottom:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.4;
+  animation:fade .3s ease;
+}
+
+.bot{
+  background:#fff;
+  border-top-left-radius:0;
+}
+
+.user{
+  background:#ffd6d6;
+  margin-left:auto;
+  border-top-right-radius:0;
+}
+
+.buttons{
+  padding:10px;
+  background:#f7f7f7;
+  border-top:1px solid rgba(0,0,0,.1);
+  display:flex;
+}
+
+.buttons button{
+  flex:1;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  background:#b30000;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1}
+}
+
+.pix-box{
+  margin-top:10px;
+  background:#f5f5f5;
+  border:1px solid #ccc;
+  border-radius:8px;
+  padding:8px;
+}
+
+.pix-box input{
+  width:100%;
+  border:none;
+  background:transparent;
+  font-size:12px;
+  outline:none;
+  color:#333;
+}
+
+.pix-box button{
+  margin-top:6px;
+  width:100%;
+  padding:6px;
+  border:none;
+  border-radius:6px;
+  background:#b30000;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.online-status {
+  color: #1aff6c; /* verde neon bonito */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  background: radial-gradient(circle, #7cffb2 0%, #1aff6c 60%, #00c853 100%);
+  border-radius: 50%;
+  animation: pulseGlow 1.1s infinite;
+  box-shadow: 0 0 6px rgba(26, 255, 108, 0.9);
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(26, 255, 108, 0.9);
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.6;
+    box-shadow: 0 0 14px rgba(26, 255, 108, 1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 6px rgba(26, 255, 108, 0.9);
+  }
+}
+
+/* ===== MODAL 1 CLIQUE ===== */
+.bank-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9988;
+}
+
+.bank-modal.hidden{display:none}
+
+.bank-box{
+  background:#111;
+  color:#fff;
+  padding:20px;
+  border-radius:14px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+}
+
+.bank-box h3{margin-bottom:12px}
+
+.bank-box button{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+  background:#b30000;
+  color:#fff;
+}
+
+.bank-box .hint{
+  font-size:12px;
+  opacity:.75;
+  margin-top:10px;
+}
+
+.bank-box .close{
+  background:#333;
+  margin-top:12px;
+}
+
+@media (min-width: 768px){
+  body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
+
+  .phone{
+    height:640px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+  <div class="header">
+    <div class="title">
+      <img src="https://files.catbox.moe/3jvcid.jpg" class="logo">
+      <span>Lábia Extrema</span>
+    </div>
+    <div class="sub online-status">
+    <span class="dot"></span>
+     bot • online agora
+   </div>
+  </div>
+
+<div class="messages" id="chat"></div>
+
+<!-- ✅ BOTÃO JÁ PAGUEI (NOVO) -->
+<div id="jaPagueiContainer"
+     style="display:none; text-align:center; padding:10px; background:#f7f7f7;">
+  <button
+    onclick="checarPagamento()"
+    style="
+      background:#0a8f3c;
+      color:#fff;
+      padding:12px 28px;
+      border:none;
+      border-radius:22px;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      width:100%;
+      max-width:320px;
+    ">
+    ✅ Já paguei
+  </button>
+</div>
+
+<!-- 🔔 BOX DE MENSAGENS DO SISTEMA -->
+<div id="infoBox"
+     style="
+       display:none;
+       position:absolute;
+       bottom:90px;
+       left:50%;
+       transform:translateX(-50%);
+       width:85%;
+       max-width:300px;
+       padding:10px;
+       background:#fff3cd;
+       color:#333;
+       border-radius:12px;
+       font-size:13px;
+       text-align:center;
+       border:1px solid #ffeeba;
+       box-shadow:0 8px 20px rgba(0,0,0,.25);
+       z-index:9999;
+     ">
+</div>
+
+<div class="buttons" id="buttons"></div>
+</div>
+
+<script>
+let paymentId = null;
+
+const chat = document.getElementById("chat");
+const buttons = document.getElementById("buttons");
+
+function botMsg(text, delay){
+  setTimeout(()=>{
+    const div = document.createElement("div");
+    div.className = "msg bot";
+    div.innerHTML = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }, delay);
+}
+
+function setButtons(list){
+  buttons.innerHTML = "";
+  list.forEach(b=>{
+    const btn = document.createElement("button");
+    btn.innerText = b.text;
+    btn.onclick = b.action;
+    buttons.appendChild(btn);
+  });
+}
+
+function showInfoBox(html) {
+  const box = document.getElementById("infoBox");
+  if (!box) return;
+
+  box.innerHTML = "<p>" + html + "</p>";
+  box.style.display = "block";
+
+  // ⏱️ esconde após 6 segundos
+  setTimeout(() => {
+    box.style.display = "none";
+  }, 15000);
+}
+
+/* ===== MENSAGENS DIVIDIDAS ===== */
+botMsg("🜂 ⚛ Bem-vindo à irmandade mais foda do Brasil.", 500);
+botMsg("Aqui não existe gados — só homens que pegam mulheres fácil. 💪", 1000);
+
+botMsg("🔱 Aqui eu te ensino:", 2000);
+botMsg("🔞 Como se comportar.\n🔞 Como falar perto dela.\n😈 O que falar pra ela.", 3000);
+
+botMsg("❤️‍🔥 A psicologia por trás dos perfumes que acendem desejos nas mentes femininas.\n😈 E muito mais…", 5200);
+
+botMsg("⚠️ Usando:\n⚜ Psicologia Obscura\n🌀 Manipulação Emocional\n🧠 Neurolinguística\n📘 Princípios de Persuasão\n🏹 Elaboração de Elogios Subjetivos", 6800);
+
+botMsg("📲 2 mil mensagens prontas baseadas em psicologia e manipulação.\nFaz ela responder na mesma hora. 🔞", 8800);
+
+botMsg("🔥 Faça qualquer pessoa comer na sua mão e ficar louca pra te dar. 😈🔞", 9000);
+
+botMsg("Para manter tudo funcionando e ajudar nas manutenções,\ncobramos apenas um valor simbólico de R$10.\n\nQuem entra aqui não paga… investe em si mesmo 🔞", 9500);
+
+/* ===== BOTÃO ÚNICO ===== */
+setTimeout(()=>{
+  setButtons([
+    { text: "💳 Gerar PIX R$10", action: gerarPix },
+    { text:"⚡ Pague com 1 clique", action: pagar1Clique }
+  ]);
+}, 10000);
+
+/* 👇 FICA AQUI */
+function copiarPix(){
+  const input = document.getElementById("pixCode");
+  if (!input) return;
+
+  input.select();
+  input.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(input.value);
+
+  alert("✅ Código PIX copiado!");
+}
+
+async function checarPagamento() {
+  if (!paymentId) return;
+
+  botMsg("⏳ Verificando pagamento...", 300);
+
+  try {
+    const res = await fetch(
+    `/status/${paymentId}`
+     );
+
+
+    const data = await res.json();
+
+    if (data.status === "approved") {
+      localStorage.setItem("isVIP", "true");
+
+      botMsg("🎉 Pagamento confirmado! Acesso VIP liberado.", 800);
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2000);
+    } else {
+      botMsg("⏳ Pagamento ainda não confirmado.", 800);
+    }
+  } catch (e) {
+    botMsg("❌ Erro ao verificar pagamento.", 800);
+  }
+}
+
+async function gerarPix(){
+  chat.innerHTML += `<div class="msg user">Gerar PIX</div>`;
+  botMsg("Gerando pagamento via PIX… ⏳", 500);
+
+  try {
+    const res = await fetch("/gerar-pix", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" }
+    });
+
+
+    if (!res.ok) throw new Error("Erro no servidor");
+
+    const data = await res.json();
+    paymentId = data.paymentId; // 👈 salva o ID
+
+    botMsg(`
+      ✅ PIX GERADO R$10<br><br>
+
+      <img src="data:image/png;base64,${data.qrBase64}" width="180"><br>
+
+      <div class="pix-box">
+        <input id="pixCode" value="${data.qr}" readonly>
+
+        <button onclick="copiarPix()">📋 Copiar código PIX</button>
+
+      </div>
+    `, 1200);
+     
+      // ⏳ Mensagem automática após 15 segundos
+        setTimeout(() => {
+        botMsg(`
+        ✨  Seu Acesso VIP aparece sozinho após o pagamento.<br>
+        Se houver atraso, clique em <b>Já paguei</b> e o sistema libera seu acesso instantaneamente.
+        `, 0);
+     }, 30000);
+
+  } catch (e) {
+    botMsg("❌ Não foi possível gerar o PIX. Tente novamente.", 1200);
+  }
+}
+
+// ===== 1 CLIQUE =====
+function abrirBancos(){
+  document.getElementById("bankModal").classList.remove("hidden");
+}
+
+function fecharBancos(){
+  document.getElementById("bankModal").classList.add("hidden");
+}
+
+function abrirBanco(banco) {
+  fecharBancos();
+
+  // 1️⃣ mostra mensagem de segurança
+  botMsg(`
+  🔒 <b>Ambiente 100% seguro</b><br><br>
+  Você será direcionado ao <b>app oficial do seu banco</b>.<br><br>
+  Cole o PIX e confirme o pagamento.<br>
+  ✨ Assim que for aprovado, seu <b>Acesso VIP aparece automaticamente</b>.
+  `, 0);
+
+  // 2️⃣ detecta sistema
+  const ua = navigator.userAgent || navigator.vendor || window.opera;
+  const isAndroid = /android/i.test(ua);
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+
+  const links = {
+    nubank: {
+      android: "https://play.google.com/store/apps/details?id=com.nu.production",
+      ios: "https://apps.apple.com/br/app/nubank/id814456780",
+      web: "https://nubank.com.br"
+    },
+    itau: {
+      android: "https://play.google.com/store/apps/details?id=com.itau",
+      ios: "https://apps.apple.com/br/app/itau/id474505665",
+      web: "https://www.itau.com.br"
+    },
+    inter: {
+      android: "https://play.google.com/store/apps/details?id=br.com.intermedium",
+      ios: "https://apps.apple.com/br/app/banco-inter/id951812587",
+      web: "https://www.bancointer.com.br"
+    },
+    c6: {
+      android: "https://play.google.com/store/apps/details?id=com.c6bank.app",
+      ios: "https://apps.apple.com/br/app/c6-bank/id1460460334",
+      web: "https://www.c6bank.com.br"
+    },
+    neon: {
+      android: "https://play.google.com/store/apps/details?id=br.com.neon",
+      ios: "https://apps.apple.com/br/app/neon/id1111816971",
+      web: "https://www.neon.com.br"
+    }
+  };
+
+  const bancoLinks = links[banco];
+  if (!bancoLinks) return;
+
+  // 3️⃣ espera a mensagem renderizar (ESSENCIAL)
+  setTimeout(() => {
+    if (isAndroid) {
+      window.location.href = bancoLinks.android;
+    } else if (isIOS) {
+      window.location.href = bancoLinks.ios;
+    } else {
+      window.location.href = bancoLinks.web;
+    }
+  }, 1200); // 👈 tempo perfeito (lê + confia)
+}
+
+function pagar1Clique() {
+  const pixInput = document.getElementById("pixCode");
+  if (!pixInput || !paymentId) {
+    alert("Gere o PIX primeiro.");
+    return;
+  }
+
+  // 1️⃣ copia o PIX imediatamente
+    navigator.clipboard.writeText(pixInput.value);
+
+      showInfoBox(
+      "✅ <b>PIX copiado automaticamente!</b><br>" +
+      "Agora abra seu banco, cole o código copiado e confirme o pagamento.<br>" +
+      "⏱️ Leva menos de 10 segundos."
+     );
+
+
+
+  // 2️⃣ abre seleção de banco (como já acontece hoje)
+  abrirBancos();
+
+// 3️⃣ após 5s, MOSTRA o botão "Já paguei" (sem mexer nos outros)
+  setTimeout(() => {
+  const jaPaguei = document.getElementById("jaPagueiContainer");
+  if (jaPaguei) jaPaguei.style.display = "block";
+}, 5000);
+
+}
+
+</script>
+
+<div id="bankModal" class="bank-modal hidden">
+  <div class="bank-box">
+    <h3>Escolha seu banco</h3>
+
+    <button onclick="abrirBanco('nubank')">Nubank</button>
+    <button onclick="abrirBanco('itau')">Itaú</button>
+    <button onclick="abrirBanco('inter')">Banco Inter</button>
+    <button onclick="abrirBanco('c6')">C6 Bank</button>
+    <button onclick="abrirBanco('neon')">Neon</button>
+
+
+    <p class="hint">
+      O pagamento será aberto no app do banco, se disponível no seu celular.
+    </p>
+
+    <button class="close" onclick="fecharBancos()">Cancelar</button>
+  </div>
+</div>
+
+</body>
+</html>

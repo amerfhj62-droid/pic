@@ -1,0 +1,22 @@
+{
+  "name": "Labia Extrema",
+  "short_name": "Labia Extrema",
+  "description": "Área VIP exclusiva",
+  "start_url": "https://labiaextremaa.netlify.app",
+  "display": "standalone",
+  "background_color": "#8b0000",
+  "theme_color": "#b00000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

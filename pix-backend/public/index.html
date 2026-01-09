@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<title>Labia Extrema</title>
+<meta name="theme-color" content="#b30000">
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-content:center}
+.phone{width:100%;max-width:420px;height:100vh;background:#111;overflow:hidden}
+.header{background:#b30000;color:#fff;padding:12px;position:sticky;top:0}
+
+/* ===== TÍTULO ===== */
+.title{display:flex;align-items:center;gap:6px;font-weight:800;font-size:18px}
+.logo{width:28px;height:28px;border-radius:50%;border:2px solid #fff}
+.labia{
+  color:#fff;
+  text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000
+}
+.extrema{
+  color:#000;
+  text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff
+}
+.verify{width:18px;height:18px}
+
+/* ===== HEADER INFO ===== */
+.counter{font-size:12px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:#00ff66;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{transform:scale(1.6)}}
+.music-btn{cursor:pointer;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:20px;font-size:13px}
+.music-hint{font-size:11px;margin-top:4px}
+
+/* ===== LISTA ===== */
+.list{background:#fff;height:calc(100vh - 90px);overflow-y:auto}
+.topic{padding:16px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.left{display:flex;align-items:center;gap:8px}
+.badge{background:#00c853;color:#fff;font-size:12px;min-width:26px;text-align:center;padding:2px 6px;border-radius:12px;font-weight:700}
+
+/* ===== CHAT ===== */
+.chat{padding:12px;height:calc(100vh - 90px);overflow-y:auto;background:#f5f5f5}
+.message{background:#fff;padding:14px;border-radius:12px}
+.react{background:#fff;padding:6px 12px;border-radius:20px;font-size:14px;cursor:pointer}
+.react.disabled{opacity:.5;pointer-events:none}
+.button{margin:12px;background:#b30000;color:#fff;padding:14px;border-radius:10px;text-align:center;font-weight:700}
+.hidden{display:none}
+
+/* ===== EMOJIS ===== */
+.emoji{animation:spin var(--spin) linear infinite,jump var(--jump) ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes jump{50%{transform:translateY(-6px)}}
+
+/* ---------------- OVERLAY VIP ---------------- */
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(7px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:500;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .35s ease;
+}
+#overlay.show{opacity:1;pointer-events:all}
+.overlay-box{
+  background:rgba(255,255,255,0.08);
+  padding:28px 22px;
+  width:85%;
+  max-width:340px;
+  border-radius:16px;
+  text-align:center;
+  color:white;
+  border:1px solid rgba(255,255,255,0.15);
+}
+.overlay-logo{
+  width:86px;height:86px;border-radius:12px;margin-bottom:12px;
+  border:3px solid rgba(255,255,255,0.18)
+}
+.overlay-title{
+  font-size:1.55rem;
+  font-style:italic;
+  font-weight:900;
+  margin-bottom:12px;
+  text-shadow:2px 2px 3px black;
+}
+.overlay-title .labia{
+  color:#ff2222;
+  text-shadow:
+    -1px -1px 0 #fff,
+     1px -1px 0 #fff,
+    -1px  1px 0 #fff,
+     1px  1px 0 #fff;
+}
+
+.overlay-title .extrema{
+  color:#ffffff;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+}
+
+.overlay-text{
+  font-size:1rem;
+  margin-bottom:18px;
+  color:#e7e7e7;
+  line-height:1.4;
+}
+/* ===== BRASÃO VIP FIXO ===== */
+.vip-badge-fixed{
+  position:absolute;
+  top:35px;
+  right:100px;
+
+  width:38px;
+  height:38px;
+
+  object-fit:contain;
+  pointer-events:none;
+
+  filter:grayscale(100%) brightness(1.1);
+  opacity:0.9;
+}
+  /* ===== BRASÃO COLORIDO PARA VIP ===== */
+  .vip-badge-fixed.vip{
+  filter:none;
+  opacity:1;
+}
+/* ===== CHAMADA VIP TOPO ===== */
+.vip-call{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  text-align:center;
+  font-weight:900;
+  font-size:14px;
+
+  padding:14px;
+  margin:6px;
+
+  /* OURO REAL */
+  background: linear-gradient(
+    135deg,
+    #fff1a8,
+    #ffd700,
+    #ffb700,
+    #ffd700
+  );
+
+  color:#3b2a00;
+
+  border-radius:12px;
+  text-decoration:none;
+
+  box-shadow:
+    0 3px 8px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.6);
+
+  border:1px solid #c9a400;
+}
+.vip-call{
+  background-size:200% 200%;
+  animation: goldMove 3s linear infinite;
+}
+
+@keyframes goldMove{
+  0%{background-position:0% 50%}
+  100%{background-position:100% 50%}
+}
+
+/* ===== BARRA VIP • OURO METÁLICO ===== */
+.vip-user{
+  margin:14px 12px;
+  padding:14px 18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  font-weight:900;
+  font-size:14px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+
+  border-radius:16px;
+
+  /* OURO METÁLICO REAL */
+  background:
+    linear-gradient(
+      135deg,
+      #6f4e00 0%,
+      #cfa43b 18%,
+      #ffec9f 35%,
+      #cfa43b 50%,
+      #b68a28 65%,
+      #ffec9f 82%,
+      #6f4e00 100%
+    );
+
+  color:#2b1a00;
+
+  /* EFEITO METAL */
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.7),
+    inset 0 -2px 2px rgba(0,0,0,.25),
+    0 6px 14px rgba(0,0,0,.35);
+
+  border:1px solid rgba(255,255,255,.45);
+
+  position:relative;
+  overflow:hidden;
+}
+
+/* ===== OVERLAY INSTALAÇÃO PWA ===== */
+.install-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.install-overlay.hidden{
+  display:none;
+}
+
+.install-box{
+  background:#111;
+  color:#fff;
+  padding:24px 20px;
+  border-radius:16px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);
+}
+
+.install-box h2{
+  margin:0 0 10px;
+  font-size:18px;
+}
+
+.install-box p{
+  font-size:14px;
+  opacity:.9;
+  margin-bottom:18px;
+}
+
+.install-btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#cfa43b,#ffdd77,#cfa43b);
+  color:#1a1200;
+  font-weight:900;
+  font-size:14px;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+
+.close-btn{
+  background:none;
+  border:none;
+  color:#bbb;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none;
+}
+
+.install-corner {
+  position: absolute;;
+  top: 10px;
+  right: 10px;
+  z-index: 5000;
+  background: linear-gradient(135deg, #ffd700, #ffb700);
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  animation: softPulse 2s infinite;
+}
+
+.phone{
+  width:100%;
+  max-width:420px;
+  height:100vh;
+  background:#111;
+  overflow:hidden;
+  position: relative; /* 👈 ESSENCIAL */
+}
+
+.install-corner.hidden {
+  display: none;
+}
+
+@keyframes softPulse {
+  0% { box-shadow: 0 0 6px rgba(255,215,0,.4); }
+  50% { box-shadow: 0 0 12px rgba(255,215,0,.9); }
+  100% { box-shadow: 0 0 6px rgba(255,215,0,.4); }
+}
+
+.vip-call{
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vip-cta-top{
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #3b2a00;
+  opacity: 0.85;
+}
+
+.vip-cta-main{
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.fake-video {
+  margin-top: 10px;
+  background: #000;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+
+/* Barra inferior */
+.fake-video-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+  font-size: 12px;
+}
+
+/* Ícones */
+.fake-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 16px;
+}
+
+.fake-time {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+/* Play central */
+.fake-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  color: rgba(255,255,255,.9);
+  pointer-events: none;
+}
+
+/* Legenda */
+.fake-caption {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,.6);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #fff;
+}
+
+.fake-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.35);
+  z-index: 5;
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+  border: 4px solid rgba(255,255,255,.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.fake-play {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- OVERLAY -->
+<div id="overlay" onclick="closeOverlay()">
+  <div class="overlay-box" onclick="event.stopPropagation()">
+    <img src="https://files.catbox.moe/3jvcid.jpg" class="overlay-logo">
+    <div class="overlay-title">
+      <span class="labia">Labia</span>
+      <span class="extrema">Extrema</span>
+    </div>
+      <div class="overlay-text">
+        Conteúdo exclusivo para membros VIP.<br>
+        Ative o acesso ou instale o app para continuar.
+       </div>
+
+    <div class="button" onclick="closeOverlay()">Entendi</div>
+  </div>
+</div>
+
+<audio id="bgm" loop preload="auto">
+  <source src="https://files.catbox.moe/zu8apj.mp3">
+</audio>
+
+<div class="phone">
+  <div class="header">
+     <!-- 🛡️ BRASÃO VIP FIXO -->
+  <img
+  id="vipBadge"
+  src="https://files.catbox.moe/05yy6a.png"
+  class="vip-badge-fixed">
+    <div class="title">
+      <img src="https://files.catbox.moe/3jvcid.jpg" class="logo">
+      <span class="labia">Labia</span>
+      <span class="extrema">Extrema</span>
+      <svg class="verify" viewBox="0 0 24 24" fill="#1DA1F2">
+        <path d="M22.5 12l-2.3 2.7.3 3.5-3.4.8-1.8 3-3.3-1.3-3.3 1.3-1.8-3-3.4-.8.3-3.5L1.5 12l2.3-2.7-.3-3.5 3.4-.8 1.8-3 3.3 1.3 3.3-1.3 1.8 3 3.4.8-.3 3.5L22.5 12z"/>
+        <path d="M10.5 15.5l-3-3 1.4-1.4 1.6 1.6 4.1-4.1 1.4 1.4z" fill="#fff"/>
+      </svg>
+    </div>
+
+      <button id="installCornerBtn" class="install-corner hidden">
+      📲 Instalar App🚀
+      </button>
+
+    <div class="counter">
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="dot"></span>
+        <span id="online"></span> online
+      </div>
+      <div id="musicBtn" class="music-btn">🎵 OFF</div>
+    </div>
+
+    <div id="musicHint" class="music-hint">
+      🎧 Clique para ouvir a música do servidor
+    </div>
+  </div>
+
+  <div id="list" class="list"></div>
+  <div id="chat" class="chat hidden"></div>
+</div>
+
+<!-- OVERLAY INSTALAÇÃO PWA -->
+<div id="installOverlay" class="install-overlay hidden">
+  <div class="install-box">
+    <h2>📲 Instale o App</h2>
+    <p>Tenha uma experiência muito melhor no celular.</p>
+
+    <button id="installBtn" class="install-btn">
+      Instalar agora
+    </button>
+
+    <button id="closeInstall" class="close-btn">
+      Agora não
+    </button>
+  </div>
+</div>
+
+<script>
+const startTime = Date.now();
+
+function notifyExit() {
+  if (localStorage.getItem("isVIP") === "true") return;
+
+        navigator.sendBeacon(
+       "/user-exit",
+        JSON.stringify({
+        isVIP: false
+     })
+   );
+}
+
+// quando fecha aba / app
+window.addEventListener("beforeunload", notifyExit);
+
+// quando minimiza ou troca de app (mobile)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    notifyExit();
+  }
+});
+
+const isVIP = localStorage.getItem("isVIP") === "true";
+const userName = localStorage.getItem("vipName") || "VIP";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const vipBadge = document.getElementById("vipBadge");
+
+  if(isVIP && vipBadge){
+    vipBadge.classList.add("vip");
+  }
+});
+
+const topics = [
+    "Evolução Pessoal e Social",
+    "📩📲Puxando Assunto nas Redes Sociais",
+    "🔞10 Frases Proibidas Pra Mandar Pra Ela Agora.🏴‍☠️",
+    "Sinais de Interesse Feminino",
+    "🔞 2 Mil Frases Proibidas Pra Mandar Pra Ela Agora.🏴‍☠️",
+    "Conteúdo Proibido em +24 países📵⚠️",
+    "O Que Evitar nas Primeiras Conversas",
+    "Manipulação Obscura😈",
+    "Comunicação Assertiva",
+    "Superando a Rejeição",
+    "A Hora Certa de Chamar pra Sair",
+    "⚠️📵Evitando Conversas Forçadas",
+    "🔞Conversas que Criam Conexão",
+    "❤️‍🔥👀Linguagem Corporal",
+    "💪🤝Autoconfiança Masculina",
+    "🙈Quebrando a Vergonha",
+    "Desafios Semanais",
+];
+
+
+const emojis=["🫦","🔥","💬","🔞","‼️","🏆","📱","📉","🗣️","🏴‍☠️","🍔","‼️","👁️","🔱","👑","🆕","💎"];
+
+const list=document.getElementById("list");
+
+const chat=document.getElementById("chat");
+const overlay=document.getElementById("overlay");
+
+function showOverlay(){overlay.classList.add("show")}
+function closeOverlay(){overlay.classList.remove("show")}
+function isBlocked(i){
+  return i === 1 || i >= 4;
+}
+
+/* ===== CONTADOR ONLINE DINÂMICO ===== */
+let onlineCount = Math.floor(Math.random() * 80000) + 115456;
+const onlineEl = document.getElementById("online");
+
+function updateOnline() {
+  const sobe = Math.random() > 0.4;
+  const variacao = Math.floor(Math.random() * 120) + 10;
+
+  onlineCount += sobe ? variacao : -variacao;
+
+  if (onlineCount < 50000) {
+    onlineCount = 50000 + Math.floor(Math.random() * 1000);
+  }
+
+  onlineEl.innerText = onlineCount.toLocaleString("pt-BR");
+}
+
+onlineEl.innerText = onlineCount.toLocaleString("pt-BR");
+setInterval(updateOnline, 3000);
+
+/* MÚSICA */
+const audio=document.getElementById("bgm");
+let musicOn=false;
+musicBtn.onclick=()=>{
+  musicOn=!musicOn;
+  musicBtn.innerText=musicOn?"🎵 ON":"🎵 OFF";
+  musicHint.style.display=musicOn?"none":"block";
+  musicOn?audio.play():audio.pause();
+};
+
+/* LISTA */
+function render(){
+  list.innerHTML = "";
+
+const showVIP = localStorage.getItem("showVIP") === "true";
+
+ if (isVIP) {
+   const vipUser = document.createElement("div");
+   vipUser.className = "vip-user";
+   vipUser.innerText = `👑 ${userName} • MEMBRO VIP 👑`;
+   list.appendChild(vipUser);
+
+}  else if (showVIP) {
+   const vipItem = document.createElement("a");
+   vipItem.href = "vip.html";
+   vipItem.className = "vip-call";
+   vipItem.innerHTML = `
+  <div class="vip-cta-top">
+    (CLIQUE AQUI 👇👇)
+  </div>
+  <div class="vip-cta-main">
+    SEJA UM MEMBRO VIP POR APENAS 10 REAIS
+  </div>
+`;
+   list.appendChild(vipItem);
+}
+// ❗ sem else → não aparece nada
+
+  topics.forEach((t,i)=>{
+    const opened = localStorage.getItem("opened_"+i);
+    const blocked = !isVIP && isBlocked(i);
+
+    const div = document.createElement("div");
+    div.className = "topic";
+
+    const left = document.createElement("div");
+    left.className = "left";
+
+    const emoji = document.createElement("span");
+    emoji.className = "emoji";
+    emoji.innerText = emojis[i];
+    emoji.style.setProperty("--spin",(Math.random()*3+1)+"s");
+    emoji.style.setProperty("--jump",(Math.random()*2+1)+"s");
+
+    left.appendChild(emoji);
+
+    /* TEXTO DO TÓPICO */
+    const text = document.createElement("span");
+    text.innerText = t;
+    left.appendChild(text);
+
+    /* 🔒 CADEADO VIP */
+    if(blocked){
+      const lock = document.createElement("span");
+      lock.innerText = " 🔒";
+      lock.style.opacity = "0.8";
+      lock.style.fontSize = "15px";
+      left.appendChild(lock);
+    }
+
+    div.appendChild(left);
+
+    if(!opened){
+      badge = document.createElement("div");
+      badge.className = "badge";
+      badge.innerText = "+99";
+      div.appendChild(badge);
+     }
+
+
+    div.onclick = () =>{
+  if(blocked){
+    showOverlay();
+    return;
+  }
+
+  localStorage.setItem("showVIP", "true"); // 👈 ADICIONE ISSO
+  openTopic(i);
+};
+
+    list.appendChild(div);
+  });
+}
+
+/* TÓPICO */
+function openTopic(i){
+  history.pushState({page:"topic"},"","");
+  localStorage.setItem("opened_"+i,"true");
+
+  let reactions=JSON.parse(localStorage.getItem("react_"+i) || JSON.stringify({
+  }));
+
+  let clicked=JSON.parse(localStorage.getItem("clicked_"+i) || "{}");
+
+chat.innerHTML = `
+  ${(messages[i] || "Conteúdo indisponível no momento.")
+    .split(/\n{2,}/)
+    .map((msg, msgIndex) => {
+
+      const reactKey = `react_${i}_${msgIndex}`;
+      const clickKey = `clicked_${i}_${msgIndex}`;
+
+      let reactions = JSON.parse(
+        localStorage.getItem(reactKey) ||
+        JSON.stringify({
+          "👍": Math.floor(Math.random()*50000)+20000,
+          "❤️": Math.floor(Math.random()*50000)+20000,
+          "🔥": Math.floor(Math.random()*50000)+20000,
+          "😎": Math.floor(Math.random()*50000)+20000,
+          "👏": Math.floor(Math.random()*50000)+20000,
+          
+          "👎": Math.floor(Math.random()*50)
+        })
+      );
+
+      localStorage.setItem(reactKey, JSON.stringify(reactions));
+
+      let clicked = JSON.parse(
+        localStorage.getItem(clickKey) || "{}"
+      );
+
+      const videoTime = getFixedVideoTime(i, msgIndex);
+
+      return `
+        <div class="message">
+          ${msg
+            .replace(
+              /\s*([\p{Emoji_Presentation}\p{Extended_Pictographic}])/gu,
+              "<br>$1"
+            )
+            .replace(/\n/g,"<br>")
+          }
+
+          <div class="fake-video">
+            <div class="fake-caption">🎬 Vídeo explicativo</div>
+            <div class="fake-play" onclick="handleFakePlay(this)">
+              ▶️
+            </div>
+
+
+            <div class="fake-video-bar">
+              <div class="fake-controls">▶️ 🔊</div>
+              <div class="fake-time">${videoTime}</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 0">
+            ${Object.keys(reactions).map(r => `
+              <div class="react ${clicked[r]?"disabled":""}"
+                onclick="${clicked[r] ? "" : `reactMsg(${i},${msgIndex},'${r}')`}">
+                ${r}
+                <span id="r_${i}_${msgIndex}_${r}">
+                  ${reactions[r].toLocaleString("pt-BR")}
+                </span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }).join("")}
+
+  <div class="button" onclick="back()">Voltar</div>
+`;
+
+  list.classList.add("hidden");
+  chat.classList.remove("hidden");
+}
+
+/* REAÇÃO */
+function react(i,r){
+  let clicked=JSON.parse(localStorage.getItem("clicked_"+i) || "{}");
+  if(clicked[r])return;
+
+  let reactions=JSON.parse(localStorage.getItem("react_"+i));
+  reactions[r]++;
+  clicked[r]=true;
+
+  localStorage.setItem("react_"+i,JSON.stringify(reactions));
+  localStorage.setItem("clicked_"+i,JSON.stringify(clicked));
+  openTopic(i);
+}
+
+function reactMsg(topic, msgIndex, emoji){
+  const reactKey = `react_${topic}_${msgIndex}`;
+  const clickKey = `clicked_${topic}_${msgIndex}`;
+
+  let reactions = JSON.parse(localStorage.getItem(reactKey));
+  let clicked = JSON.parse(localStorage.getItem(clickKey) || "{}");
+
+  // se já clicou nesse emoji dessa mensagem, bloqueia
+  if(clicked[emoji]) return;
+
+  reactions[emoji]++;
+  clicked[emoji] = true;
+
+  localStorage.setItem(reactKey, JSON.stringify(reactions));
+  localStorage.setItem(clickKey, JSON.stringify(clicked));
+
+  openTopic(topic); // atualiza a tela
+}
+
+/* VOLTAR */
+function back(){history.back()}
+window.addEventListener("popstate",()=>{
+  if(!chat.classList.contains("hidden")){
+    chat.classList.add("hidden");
+    list.classList.remove("hidden");
+    render();
+    history.pushState({page:"list"},"","");
+  }
+});
+
+
+
+/* ================= CRESCIMENTO AUTOMÁTICO DE REAÇÕES ================= */
+
+function startReactionDrift(){
+  setInterval(() => {
+
+    Object.keys(localStorage).forEach(key => {
+
+      // só reações por mensagem
+      if(!key.startsWith("react_")) return;
+
+      const parts = key.split("_");
+
+      // react_topic_msg
+      if(parts.length !== 3) return;
+
+      let data;
+      try {
+        data = JSON.parse(localStorage.getItem(key));
+      } catch {
+        return;
+      }
+
+      let changed = false;
+
+      Object.keys(data).forEach(emoji => {
+        // chance pequena = crescimento lento
+        if(Math.random() < 0.35){
+          data[emoji] += 1;
+          changed = true;
+        }
+      });
+
+      if(changed){
+        localStorage.setItem(key, JSON.stringify(data));
+      }
+
+    });
+
+    // ATUALIZA A TELA (se estiver aberta)
+    document.querySelectorAll("[id^='r_']").forEach(span => {
+      const parts = span.id.split("_");
+      // r_topic_msg_emoji
+      const topic = parts[1];
+      const msg = parts[2];
+      const emoji = parts.slice(3).join("_");
+
+      const key = `react_${topic}_${msg}`;
+      const data = JSON.parse(localStorage.getItem(key));
+
+      if(data && data[emoji] !== undefined){
+        span.innerText = data[emoji].toLocaleString("pt-BR");
+      }
+    });
+
+  }, 4000); // velocidade geral
+}
+
+let messages = {};
+
+const BACKEND_URL = "";
+
+function carregarConteudo() {
+  fetch(`${BACKEND_URL}/conteudo`)
+    .then(res => res.json())
+    .then(data => {
+      messages = data.messages || {};
+      render();
+    })
+    .catch(err => {
+      console.error("Erro ao carregar conteúdo:", err);
+    });
+}
+
+carregarConteudo();
+
+
+
+// inicia automaticamente
+startReactionDrift();
+
+/* =========================
+   OVERLAY DE INSTALAÇÃO PWA
+========================= */
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // mostra botão fixo se não estiver instalado
+  if (!isAppInstalled()) {
+    installFixedBtn.classList.remove("hidden");
+  }
+});
+
+window.addEventListener("load", () => {
+  const dismissed = localStorage.getItem("installDismissed");
+
+  if(!dismissed){
+    setTimeout(() => {
+      document
+        .getElementById("installOverlay")
+        .classList.remove("hidden");
+    }, 3000);
+  }
+});
+
+document.getElementById("installBtn").onclick = async () => {
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+
+    document
+      .getElementById("installOverlay")
+      .classList.add("hidden");
+
+    localStorage.setItem("installDismissed", "true");
+  }
+};
+
+document.getElementById("closeInstall").onclick = () => {
+  document
+    .getElementById("installOverlay")
+    .classList.add("hidden");
+
+  localStorage.setItem("installDismissed", "true");
+
+  // 👇 MOSTRA O BOTÃO IMEDIATAMENTE
+  document
+    .getElementById("installCornerBtn")
+    .classList.remove("hidden");
+};
+
+function handleFakePlay(playEl){
+  // se for VIP, não bloqueia
+  if(localStorage.getItem("isVIP") === "true"){
+    return;
+  }
+
+  const video = playEl.closest(".fake-video");
+  if(!video) return;
+
+  // evita clicar duas vezes
+  if(video.querySelector(".fake-loading")) return;
+
+  // cria loading
+  const loading = document.createElement("div");
+  loading.className = "fake-loading";
+  loading.innerHTML = `<div class="spinner"></div>`;
+
+  video.appendChild(loading);
+
+  // simula carregamento do vídeo
+  setTimeout(() => {
+    loading.remove();
+    showOverlay(); // 👈 seu overlay VIP existente
+  }, 1600);
+}
+
+
+/* ========================= */
+
+render();
+history.replaceState({page:"list"},"","");
+/* ===== CHAMADA VIP FIXA (FORA DOS EMOJIS) ===== */
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+
+let deferredPrompt = null;
+const cornerBtn = document.getElementById("installCornerBtn");
+
+if (localStorage.getItem("appInstalled") === "true") {
+  cornerBtn.classList.add("hidden");
+}
+
+if (localStorage.getItem("installDismissed") === "true") {
+  cornerBtn.classList.remove("hidden");
+}
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+cornerBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) {
+    alert("📲 Use o menu do navegador para instalar o app");
+    return;
+  }
+
+  deferredPrompt.prompt();
+  const result = await deferredPrompt.userChoice;
+
+  if (result.outcome === "accepted") {
+    localStorage.setItem("appInstalled", "true");
+    cornerBtn.classList.add("hidden");
+  }
+
+  deferredPrompt = null;
+});
+
+if (window.matchMedia("(display-mode: standalone)").matches) {
+  localStorage.setItem("appInstalled", "true");
+  cornerBtn.classList.add("hidden");
+}
+</script>
+
+<script>
+async function registerPushIfAllowed() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") return;
+
+  const reg = await navigator.serviceWorker.ready;
+
+  const subscription = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(
+      "BJVYSFWxGkAtA8_zCMqMqAXhtb1-cwqKpMuKRI63eqaDFCUOUyF__gkQdBlLhV9ViXmcrdzbC95HeUvPuMrWXTo"
+    )
+  });
+
+  fetch("/push-subscribe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      subscription,
+      isVIP: localStorage.getItem("isVIP") === "true"
+    })
+  });
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+// 🔥 REGISTRA APENAS SE NÃO FOR VIP
+window.addEventListener("load", () => {
+  if (localStorage.getItem("isVIP") !== "true") {
+    registerPushIfAllowed();
+  }
+});
+
+function getFixedVideoTime(topicIndex, msgIndex) {
+  const key = `video_time_${topicIndex}_${msgIndex}`;
+
+  // se já existe, reutiliza
+  let saved = localStorage.getItem(key);
+  if (saved) return saved;
+
+  // gera tempo aleatório "crível"
+  const min = 90;   // 1:30
+  const max = 360;  // 6:00
+  const total = Math.floor(Math.random() * (max - min)) + min;
+
+  const m = Math.floor(total / 60);
+  const s = String(total % 60).padStart(2, "0");
+
+  const time = `${m}:${s}`;
+
+  localStorage.setItem(key, time);
+  return time;
+}
+</script>
+
+
+</body>
+</html>
