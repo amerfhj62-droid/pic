@@ -43,16 +43,23 @@ app.post("/track", (req, res) => {
   res.json({ ok: true });
 });
 
-// ===== PUSH SUBSCRIBE
+// ===== PUSH SUBSCRIBE (APENAS NÃO VIP)
 app.post("/push-subscribe", (req, res) => {
   const { subscription, isVIP } = req.body;
 
-  if (!subscription || isVIP) {
+  if (!subscription) {
     return res.json({ ok: false });
   }
 
-  if (!pushSubscribers.find(s => s.endpoint === subscription.endpoint)) {
-    pushSubscribers.push(subscription);
+  const exists = pushSubscribers.find(
+    s => s.endpoint === subscription.endpoint
+  );
+
+  if (!exists) {
+    pushSubscribers.push({
+      ...subscription,
+      isVIP: isVIP === true
+    });
   }
 
   res.json({ ok: true });
@@ -190,6 +197,8 @@ function randomTopic(){
 
 function sendPushToAllNonVIPs(payload){
   pushSubscribers.forEach(sub => {
+    if (sub.isVIP) return;
+
     webpush.sendNotification(
       sub,
       JSON.stringify(payload)
@@ -201,7 +210,7 @@ setInterval(() => {
   const payload = {
     title: "🔥 Lábia Extrema!!",
     body: `${rand(17,128)} conteúdos novos no tópico ${randomTopic()}`,
-    url: "/vip.html"
+    url: "https://labiaaextrema.netlify.app"
   };
 
   sendPushToAllNonVIPs(payload);
@@ -212,7 +221,7 @@ setTimeout(() => {
   const payload = {
     title: "🧪 TESTE PUSH",
     body: "Se você recebeu isso, o sistema de notificação está FUNCIONANDO 🚀",
-    url: "/vip.html"
+    url: "https://labiaaextrema.netlify.app"
   };
 
   sendPushToAllNonVIPs(payload);
