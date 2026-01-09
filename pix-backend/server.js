@@ -55,12 +55,14 @@ app.post("/push-subscribe", (req, res) => {
     s => s.endpoint === subscription.endpoint
   );
 
-  if (!exists) {
-    pushSubscribers.push({
-      ...subscription,
-      isVIP: isVIP === true
-    });
-  }
+  if (!exists && !isVIP) {
+  pushSubscribers.push({
+    endpoint: subscription.endpoint,
+    keys: subscription.keys,
+    isVIP: false,
+    lastSeen: Date.now()
+  });
+}
 
   res.json({ ok: true });
 });
@@ -166,9 +168,44 @@ app.post("/criar-pagamento", async (req, res) => {
   }
 });
 
+let exitCooldown = false;
+
+app.post("/user-exit", (req, res) => {
+  const { isVIP } = req.body;
+
+  if (isVIP || exitCooldown) {
+    return res.sendStatus(200);
+  }
+
+  exitCooldown = true;
+
+  setTimeout(() => {
+    const payload = JSON.stringify({
+      title: "😈 Ei… voltou rápido?",
+      body: "Você saiu antes de ver o conteúdo mais insano 🔥",
+      url: "https://labiaaextrema.netlify.app"
+    });
+
+    pushSubscribers.forEach(sub => {
+      if (sub.isVIP) return;
+      webpush.sendNotification(sub, payload).catch(() => {});
+    });
+
+    // libera novamente depois
+    setTimeout(() => {
+      exitCooldown = false;
+    }, 15000);
+
+  }, 10000);
+
+  res.sendStatus(200);
+});
+
+
 // ===============================
 // STATUS PAGAMENTO
 // ===============================
+
 app.get("/status/:id", async (req, res) => {
   try {
     const pagamento = await mercadopago.payment.get(req.params.id);
