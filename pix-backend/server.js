@@ -2,10 +2,22 @@ import express from "express";
 import cors from "cors";
 import mercadopago from "mercadopago";
 import webpush from "web-push";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const app = express();
+const app = express(); // 👈 PRIMEIRO
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors());
 app.use(express.json());
+
+const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
+
+
+// 🔥 SERVE O FRONTEND
+app.use(express.static(path.join(__dirname, "public")));
 
 webpush.setVapidDetails(
   "mailto:amerfhj62@gmail.com",
@@ -152,10 +164,10 @@ app.post("/criar-pagamento", async (req, res) => {
         quantity: 1,
         unit_price: 10
       }],
-      back_urls: {
-        success: "https://labiaaextrema.netlify.app/vip.html",
-        failure: "https://labiaaextrema.netlify.app/vip.html",
-        pending: "https://labiaaextrema.netlify.app/vip.html"
+       back_urls: {
+       success: `${BASE_URL}/vip.html`,
+       failure: `${BASE_URL}/vip.html`,
+       pending: `${BASE_URL}/vip.html`
       },
       auto_return: "approved"
     };
@@ -183,7 +195,7 @@ app.post("/user-exit", (req, res) => {
     const payload = JSON.stringify({
       title: "😈 Ei… voltou rápido?",
       body: "Você saiu antes de ver o conteúdo mais insano 🔥",
-      url: "https://labiaaextrema.netlify.app"
+      url: BASE_URL 
     });
 
     pushSubscribers.forEach(sub => {
@@ -247,7 +259,7 @@ setInterval(() => {
   const payload = {
     title: "🔥 Lábia Extrema!!",
     body: `${rand(17,128)} conteúdos novos no tópico ${randomTopic()}`,
-    url: "https://labiaaextrema.netlify.app"
+    url: BASE_URL 
   };
 
   sendPushToAllNonVIPs(payload);
@@ -258,13 +270,15 @@ setTimeout(() => {
   const payload = {
     title: "🧪 TESTE PUSH",
     body: "Se você recebeu isso, o sistema de notificação está FUNCIONANDO 🚀",
-    url: "https://labiaaextrema.netlify.app"
+    url: BASE_URL 
   };
 
   sendPushToAllNonVIPs(payload);
 }, 10000); // 10 segundos
 
-
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 // ===============================
 const PORT = process.env.PORT || 3000;
