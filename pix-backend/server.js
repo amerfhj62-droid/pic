@@ -1,10 +1,17 @@
 import express from "express";
 import cors from "cors";
 import mercadopago from "mercadopago";
+import webpush from "web-push";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+webpush.setVapidDetails(
+  "mailto:amerfhj62@gmail.com",
+  process.env.VAPID_PUBLIC,
+  process.env.VAPID_PRIVATE
+);
 
 // ===============================
 // VARIÁVEIS
@@ -17,6 +24,9 @@ let metrics = {
   sessions: 0
 };
 
+let pushSubscribers = [];
+
+// ===== TRACK
 app.post("/track", (req, res) => {
   const { isVIP, timeSpent } = req.body;
 
@@ -29,6 +39,21 @@ app.post("/track", (req, res) => {
   metrics.totalTime += timeSpent || 0;
 
   if (isVIP) metrics.vipUsers++;
+
+  res.json({ ok: true });
+});
+
+// ===== PUSH SUBSCRIBE
+app.post("/push-subscribe", (req, res) => {
+  const { subscription, isVIP } = req.body;
+
+  if (!subscription || isVIP) {
+    return res.json({ ok: false });
+  }
+
+  if (!pushSubscribers.find(s => s.endpoint === subscription.endpoint)) {
+    pushSubscribers.push(subscription);
+  }
 
   res.json({ ok: true });
 });
@@ -145,6 +170,55 @@ app.get("/status/:id", async (req, res) => {
     res.status(500).json({ error: true });
   }
 });
+
+const blockedTopics = [
+  "📩📲 Puxando Assunto nas Redes Sociais",
+  "🔞 10 Frases Proibidas Pra Mandar Pra Ela Agora",
+  "Conteúdo Proibido em +24 países",
+  "Manipulação Obscura 😈"
+];
+
+function rand(min, max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomTopic(){
+  return blockedTopics[
+    Math.floor(Math.random() * blockedTopics.length)
+  ];
+}
+
+function sendPushToAllNonVIPs(payload){
+  pushSubscribers.forEach(sub => {
+    webpush.sendNotification(
+      sub,
+      JSON.stringify(payload)
+    ).catch(() => {});
+  });
+}
+
+setInterval(() => {
+  const payload = {
+    title: "🔥 Lábia Extrema!!",
+    body: `${rand(17,128)} conteúdos novos no tópico ${randomTopic()}`,
+    url: "/vip.html"
+  };
+
+  sendPushToAllNonVIPs(payload);
+}, 5 * 60 * 60 * 1000);
+
+// ===== TESTE IMEDIATO (REMOVER DEPOIS)
+setTimeout(() => {
+  const payload = {
+    title: "🧪 TESTE PUSH",
+    body: "Se você recebeu isso, o sistema de notificação está FUNCIONANDO 🚀",
+    url: "/vip.html"
+  };
+
+  sendPushToAllNonVIPs(payload);
+}, 10000); // 10 segundos
+
+
 
 // ===============================
 const PORT = process.env.PORT || 3000;
