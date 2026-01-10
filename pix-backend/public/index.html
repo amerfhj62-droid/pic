@@ -506,19 +506,22 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
 
 <script>
 const startTime = Date.now();
-
 function notifyExit() {
   if (localStorage.getItem("isVIP") === "true") return;
 
-        navigator.sendBeacon(
-       "/user-exit",
-        JSON.stringify({
-        isVIP: false,
-        endpoint: localStorage.getItem("pushEndpoint")
-     })
-   );
-}
+  const endpoint = localStorage.getItem("pushEndpoint");
+  if (!endpoint) return; // 👈 ESSENCIAL
 
+  const data = new Blob(
+    [JSON.stringify({
+      isVIP: false,
+      endpoint
+    })],
+    { type: "application/json" }
+  );
+
+  navigator.sendBeacon("/user-exit", data);
+}
 // quando fecha aba / app
 window.addEventListener("beforeunload", notifyExit);
 
