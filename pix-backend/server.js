@@ -77,7 +77,7 @@ app.post("/push-subscribe", (req, res) => {
 });
 
   res.json({ ok: true });
-});
+}
 
 app.get("/metrics", (req, res) => {
   if (req.headers["x-admin-token"] !== process.env.ADMIN_TOKEN) {
