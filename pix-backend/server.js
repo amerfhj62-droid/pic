@@ -69,12 +69,12 @@ app.post("/push-subscribe", (req, res) => {
 
   if (!exists && !isVIP) {
   pushSubscribers.push({
-    endpoint: subscription.endpoint,
-    keys: subscription.keys,
-    isVIP: false,
-    lastSeen: Date.now()
-  });
-}
+  endpoint: subscription.endpoint,
+  keys: subscription.keys,
+  isVIP: false,
+  lastSeen: Date.now(),
+  exitPushCount: 0   // 👈 NOVO
+});
 
   res.json({ ok: true });
 });
@@ -180,36 +180,50 @@ app.post("/criar-pagamento", async (req, res) => {
   }
 });
 
-let exitCooldown = false;
+const exitTimers = new Map();
 
 app.post("/user-exit", (req, res) => {
-  const { isVIP } = req.body;
+  const { isVIP, endpoint } = req.body;
 
-  if (isVIP || exitCooldown) {
+  if (isVIP || !endpoint) {
     return res.sendStatus(200);
   }
 
-  exitCooldown = true;
+  const sub = pushSubscribers.find(
+    s => s.endpoint === endpoint
+  );
 
-  setTimeout(() => {
-    const payload = JSON.stringify({
-      title: "😈 Ei… voltou rápido?",
-      body: "Você saiu antes de ver o conteúdo mais insano 🔥",
-      url: BASE_URL 
-    });
+  if (!sub) {
+    return res.sendStatus(200);
+  }
 
-    pushSubscribers.forEach(sub => {
-      if (sub.isVIP) return;
-      webpush.sendNotification(sub, payload).catch(() => {});
-    });
+  // 🔒 limite máximo: 4 notificações por usuário
+  if (sub.exitPushCount >= 4) {
+    return res.sendStatus(200);
+  }
 
-    // libera novamente depois
-    setTimeout(() => {
-      exitCooldown = false;
-    }, 15000);
+  // ⛔ já existe push agendado para esse usuário
+  if (exitTimers.has(endpoint)) {
+    return res.sendStatus(200);
+  }
 
-  }, 10000);
+  const timer = setTimeout(() => {
+    const payload = {
+      title: "🔥 Lábia Extrema!!",
+      body: `${rand(17,128)} conteúdos novos no tópico ${randomTopic()}`,
+      url: BASE_URL
+    };
 
+    webpush.sendNotification(
+      sub,
+      JSON.stringify(payload)
+    ).catch(() => {});
+
+    sub.exitPushCount++;
+    exitTimers.delete(endpoint);
+  }, 10_000);
+
+  exitTimers.set(endpoint, timer);
   res.sendStatus(200);
 });
 
