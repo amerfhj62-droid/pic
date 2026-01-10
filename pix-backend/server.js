@@ -73,11 +73,11 @@ app.post("/push-subscribe", (req, res) => {
   keys: subscription.keys,
   isVIP: false,
   lastSeen: Date.now(),
-  exitPushCount: 0   // 👈 NOVO
+  exitPushCount: 0,   // 👈 NOVO
 });
 
   res.json({ ok: true });
-}
+});
 
 app.get("/metrics", (req, res) => {
   if (req.headers["x-admin-token"] !== process.env.ADMIN_TOKEN) {
