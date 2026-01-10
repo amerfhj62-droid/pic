@@ -513,7 +513,8 @@ function notifyExit() {
         navigator.sendBeacon(
        "/user-exit",
         JSON.stringify({
-        isVIP: false
+        isVIP: false,
+        endpoint: localStorage.getItem("pushEndpoint")
      })
    );
 }
@@ -1045,6 +1046,9 @@ async function registerPushIfAllowed() {
       "BJVYSFWxGkAtA8_zCMqMqAXhtb1-cwqKpMuKRI63eqaDFCUOUyF__gkQdBlLhV9ViXmcrdzbC95HeUvPuMrWXTo"
     )
   });
+  
+  // ✅ SALVA O ENDPOINT DO USUÁRIO
+  localStorage.setItem("pushEndpoint", subscription.endpoint);
 
   fetch("/push-subscribe", {
     method: "POST",
