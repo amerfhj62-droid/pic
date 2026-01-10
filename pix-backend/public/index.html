@@ -910,9 +910,9 @@ window.addEventListener("beforeinstallprompt", (e) => {
   deferredPrompt = e;
 
   // mostra botão fixo se não estiver instalado
-  if (!isAppInstalled()) {
-    installFixedBtn.classList.remove("hidden");
-  }
+  if (localStorage.getItem("appInstalled") !== "true") {
+  installFixedBtn.classList.remove("hidden");
+}
 });
 
 window.addEventListener("load", () => {
