@@ -69,14 +69,15 @@ app.post("/push-subscribe", (req, res) => {
 
   if (!exists && !isVIP) {
   pushSubscribers.push({
-  endpoint: subscription.endpoint,
-  keys: subscription.keys,
-  isVIP: false,
-  lastSeen: Date.now(),
-  exitPushCount: 0,   // 👈 NOVO
-});
+    endpoint: subscription.endpoint,
+    keys: subscription.keys,
+    isVIP: false,
+    lastSeen: Date.now(),
+    exitPushCount: 0
+  });
+}
 
-  res.json({ ok: true });
+res.json({ ok: true });
 });
 
 app.get("/metrics", (req, res) => {
