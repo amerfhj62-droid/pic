@@ -2,7 +2,7 @@
   "name": "Labia Extrema",
   "short_name": "Labia Extrema",
   "description": "Área VIP exclusiva",
-  "start_url": "https://pix-backend-cfok.onrender.com/"
+  "start_url": "https://pix-backend-cfok.onrender.com/",
   "display": "standalone",
   "background_color": "#8b0000",
   "theme_color": "#b00000",
