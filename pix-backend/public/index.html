@@ -467,10 +467,9 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
       </svg>
     </div>
 
-      <button id="installFixedBtn" class="hidden">
+      <button id="installCornerBtn" class="install-corner hidden">
       📲 Instalar App🚀
       </button>
-
 
     <div class="counter">
       <div style="display:flex;gap:6px;align-items:center">
@@ -910,11 +909,10 @@ window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
 
-  const installFixedBtn = document.getElementById("installFixedBtn");
   // mostra botão fixo se não estiver instalado
-  if (localStorage.getItem("appInstalled") !== "true") {
-  installFixedBtn.classList.remove("hidden");
-}
+  if (!isAppInstalled()) {
+    installFixedBtn.classList.remove("hidden");
+  }
 });
 
 window.addEventListener("load", () => {
