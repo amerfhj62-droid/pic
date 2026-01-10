@@ -38,6 +38,16 @@ let metrics = {
 
 let pushSubscribers = [];
 
+function cleanSub(sub) {
+  return {
+    endpoint: sub.endpoint,
+    keys: {
+      p256dh: sub.keys.p256dh,
+      auth: sub.keys.auth
+    }
+  };
+}
+
 // ===== TRACK
 app.post("/track", (req, res) => {
   const { isVIP, timeSpent } = req.body;
@@ -216,9 +226,9 @@ app.post("/user-exit", (req, res) => {
     };
 
     webpush.sendNotification(
-      sub,
-      JSON.stringify(payload)
-    ).catch(() => {});
+     cleanSub(sub),
+     JSON.stringify(payload)
+    ).catch(err => console.error("Push exit error:", err));
 
     sub.exitPushCount++;
     exitTimers.delete(endpoint);
@@ -264,9 +274,9 @@ function sendPushToAllNonVIPs(payload){
     if (sub.isVIP) return;
 
     webpush.sendNotification(
-      sub,
-      JSON.stringify(payload)
-    ).catch(() => {});
+     cleanSub(sub),
+     JSON.stringify(payload)
+   ).catch(err => console.error("Push global error:", err));
   });
 }
 
