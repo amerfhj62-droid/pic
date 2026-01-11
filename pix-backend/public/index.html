@@ -1100,8 +1100,30 @@ function getFixedVideoTime(topicIndex, msgIndex) {
   localStorage.setItem(key, time);
   return time;
 }
-</script>
+/* =========================
+   TRACK DE VISITA REAL
+========================= */
 
+const visitStartTime = Date.now();
+
+// envia métricas quando o usuário sai
+window.addEventListener("beforeunload", () => {
+  const timeSpent = Math.floor(
+    (Date.now() - visitStartTime) / 1000
+  );
+
+  fetch("/track", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      isVIP: localStorage.getItem("isVIP") === "true",
+      timeSpent
+    })
+  });
+});
+</script>
 
 </body>
 </html>
