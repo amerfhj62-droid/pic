@@ -329,28 +329,35 @@ function save(){
   alert("Conteúdo salvo com sucesso");
 }
 
-// ===== MÉTRICAS =====
-const visits=JSON.parse(localStorage.getItem("visits")||"[]");
-const times=JSON.parse(localStorage.getItem("times")||"[]");
-const vip=localStorage.getItem("isVIP")==="true";
+/* =========================
+   MÉTRICAS REAIS (BACKEND)
+========================= */
 
-const todayStr=new Date().toISOString().slice(0,10);
-const weekAgo=Date.now()-7*86400000;
+fetch("/metrics", {
+  headers: {
+    "x-admin-token": "COLOQUE_AQUI_SEU_ADMIN_TOKEN"
+  }
+})
+.then(res => {
+  if (!res.ok) throw new Error("Não autorizado");
+  return res.json();
+})
+.then(data => {
+  document.getElementById("total").innerText = data.total;
+  document.getElementById("today").innerText = data.today;
+  document.getElementById("week").innerText  = data.week;
+  document.getElementById("vip").innerText   = data.vip;
+  document.getElementById("time").innerText  = data.avgTime + "s";
 
-document.getElementById("total").innerText=visits.length;
-document.getElementById("today").innerText=
-  visits.filter(v=>v.date===todayStr).length;
-document.getElementById("week").innerText=
-  visits.filter(v=>v.time>=weekAgo).length;
-
-document.getElementById("vip").innerText=vip?1:0;
-
-const avg=times.length?
-  Math.floor(times.reduce((a,b)=>a+b,0)/times.length):0;
-document.getElementById("time").innerText=avg+"s";
-
-document.getElementById("conv").innerText=
-  visits.length?((vip?1:0)/visits.length*100).toFixed(1)+"%":"0%";
+  document.getElementById("conv").innerText =
+    data.total
+      ? ((data.vip / data.total) * 100).toFixed(1) + "%"
+      : "0%";
+})
+.catch(err => {
+  alert("Erro ao carregar métricas");
+  console.error(err);
+});
 
 // ===== GRÁFICO =====
 const chart=document.getElementById("chart");
