@@ -574,7 +574,7 @@ const overlay=document.getElementById("overlay");
 function showOverlay(){overlay.classList.add("show")}
 function closeOverlay(){overlay.classList.remove("show")}
 function isBlocked(i){
-  return i === 1 || i >= 4;
+  return i === 1 || i >= 3;
 }
 
 /* ===== CONTADOR ONLINE DINÂMICO ===== */
@@ -741,7 +741,7 @@ chat.innerHTML = `
           }
 
           <div class="fake-video">
-            <div class="fake-caption">🎬 Vídeo explicativo</div>
+            <div class="fake-caption">🎬 Videoaula Explicativa.</div>
             <div class="fake-play" onclick="handleFakePlay(this)">
               ▶️
             </div>
