@@ -432,7 +432,7 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
 <!-- OVERLAY -->
 <div id="overlay" onclick="closeOverlay()">
   <div class="overlay-box" onclick="event.stopPropagation()">
-    <img src="https://files.catbox.moe/3jvcid.jpg" class="overlay-logo">
+    <img src="logooverlay.png" class="overlay-logo">
     <div class="overlay-title">
       <span class="labia">Labia</span>
       <span class="extrema">Extrema</span>
@@ -455,10 +455,10 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
      <!-- 🛡️ BRASÃO VIP FIXO -->
   <img
   id="vipBadge"
-  src="https://files.catbox.moe/05yy6a.png"
+  src="viplogo.png"
   class="vip-badge-fixed">
     <div class="title">
-      <img src="https://files.catbox.moe/3jvcid.jpg" class="logo">
+      <img src="logo.png" class="logo">
       <span class="labia">Labia</span>
       <span class="extrema">Extrema</span>
       <svg class="verify" viewBox="0 0 24 24" fill="#1DA1F2">
@@ -474,7 +474,7 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
     <div class="counter">
       <div style="display:flex;gap:6px;align-items:center">
         <span class="dot"></span>
-        <span id="online"></span> online
+        <span id="online"></span> Usuários Online
       </div>
       <div id="musicBtn" class="music-btn">🎵 OFF</div>
     </div>
@@ -1100,30 +1100,8 @@ function getFixedVideoTime(topicIndex, msgIndex) {
   localStorage.setItem(key, time);
   return time;
 }
-/* =========================
-   TRACK DE VISITA REAL
-========================= */
-
-const visitStartTime = Date.now();
-
-// envia métricas quando o usuário sai
-window.addEventListener("beforeunload", () => {
-  const timeSpent = Math.floor(
-    (Date.now() - visitStartTime) / 1000
-  );
-
-  fetch("/track", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      isVIP: localStorage.getItem("isVIP") === "true",
-      timeSpent
-    })
-  });
-});
 </script>
+
 
 </body>
 </html>
