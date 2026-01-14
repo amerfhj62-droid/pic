@@ -473,6 +473,8 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
   border-radius:18px;
   text-align:center;
   box-shadow:0 15px 40px rgba(0,0,0,.8);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .vip-offer-box h2{
@@ -606,6 +608,13 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
   text-align: center;
   color: #ffd700;
   text-shadow: 1px 1px 2px #000;
+}
+
+@media (max-height: 750px) {
+  .pix-qrcode img{
+    width: 220px;
+    height: 220px;
+  }
 }
 </style>
 </head>
@@ -1535,6 +1544,16 @@ async function gerarPixReal() {
 if (checkBtn) {
   checkBtn.classList.add("hidden");
 }
+setTimeout(() => {
+  const box = document.querySelector(".vip-offer-box");
+  if (box) {
+    box.scrollTo({
+      top: box.scrollHeight,
+      behavior: "smooth"
+    });
+  }
+}, 300);
+
 
 const hint = document.getElementById("vipCheckHint");
 if (hint) hint.classList.add("hidden");
