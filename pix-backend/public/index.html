@@ -424,6 +424,147 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
   pointer-events: auto;
 }
 
+/* 💥 EXPLOSÃO DO CADEADO */
+.lock {
+  display: inline-block;
+  transition: transform .4s ease, opacity .4s ease;
+}
+
+.lock.explode {
+  animation: lockBoom .4s ease forwards;
+}
+
+@keyframes lockBoom {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.6) rotate(20deg);
+  }
+  100% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* ===== OVERLAY OFERTA VIP ===== */
+.vip-offer-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:800;
+}
+
+.vip-offer-overlay.hidden{
+  display:none;
+}
+
+.vip-offer-box{
+  background:#111;
+  color:#fff;
+  padding:26px 22px;
+  width:90%;
+  max-width:360px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,.8);
+}
+
+.vip-offer-box h2{
+  color:#ffd700;
+  margin-bottom:14px;
+}
+
+.vip-offer-text{
+  font-size:14px;
+  line-height:1.45;
+  opacity:.95;
+}
+
+.vip-offer-btn{
+  margin-top:16px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(135deg,#ffd700,#ffb700);
+  color:#2b1a00;
+}
+
+.vip-payment{
+  margin-top:18px;
+}
+
+.vip-payment img{
+  width:160px;
+  height:160px;
+  margin-bottom:10px;
+}
+
+.vip-pix-code{
+  background:#000;
+  padding:10px;
+  border-radius:10px;
+  font-size:11px;
+  word-break:break-all;
+  margin-bottom:8px;
+}
+
+.copy-btn{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.vip-offer-title{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.vip-offer-title .verify{
+  width:18px;
+  height:18px;
+}
+
+.vip-auto-release{
+  margin: 10px 0 12px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: #d6ffd6;
+  background: rgba(0, 255, 100, 0.08);
+  border: 1px solid rgba(0, 255, 100, 0.25);
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.hidden{
+  display:none;
+}
+
+.vip-check-hint{
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #cfcfcf;
+  opacity: 0.9;
+  text-align: center;
+}
 </style>
 </head>
 
@@ -438,11 +579,13 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
       <span class="extrema">Extrema</span>
     </div>
       <div class="overlay-text">
-        Conteúdo exclusivo para membros VIP.<br>
-        Ative o acesso ou instale o app para continuar.
-       </div>
+       📲 O acesso completo está disponível no app.<br>
+       Instale agora e desbloqueie todos os tópicos imediatamente.
+      </div>
 
-    <div class="button" onclick="closeOverlay()">Entendi</div>
+     <div class="button" onclick="installFromOverlay()">
+     📲 Instalar App
+    </div>
   </div>
 </div>
 
@@ -522,9 +665,36 @@ function notifyExit() {
 
   navigator.sendBeacon("/user-exit", data);
 }
+
+let paymentId = null;
 // quando fecha aba / app
 window.addEventListener("beforeunload", notifyExit);
 
+function installFromOverlay(){
+  // fecha o overlay
+  closeOverlay();
+
+  // se o prompt de instalação estiver disponível
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === "accepted") {
+        localStorage.setItem("appInstalled", "true");
+
+        const cornerBtn = document.getElementById("installCornerBtn");
+        if (cornerBtn) cornerBtn.classList.add("hidden");
+      }
+    });
+
+    deferredPrompt = null;
+  } else {
+    // fallback (iOS / Safari)
+    document
+      .getElementById("installOverlay")
+      .classList.remove("hidden");
+  }
+}
 // quando minimiza ou troca de app (mobile)
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
@@ -534,11 +704,24 @@ document.addEventListener("visibilitychange", () => {
 
 const isVIP = localStorage.getItem("isVIP") === "true";
 const userName = localStorage.getItem("vipName") || "VIP";
+let sessionUnlocked = false;
+
+function isPWA(){
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  );
+}
+window.isPWA = isPWA;
 
 document.addEventListener("DOMContentLoaded", () => {
-  const vipBadge = document.getElementById("vipBadge");
+  const checkBtn = document.getElementById("vipCheckBtn");
+  if (checkBtn) {
+    checkBtn.onclick = checarPagamento;
+  }
 
-  if(isVIP && vipBadge){
+  const vipBadge = document.getElementById("vipBadge");
+  if (isVIP && vipBadge) {
     vipBadge.classList.add("vip");
   }
 });
@@ -574,9 +757,14 @@ const overlay=document.getElementById("overlay");
 function showOverlay(){overlay.classList.add("show")}
 function closeOverlay(){overlay.classList.remove("show")}
 function isBlocked(i){
-  return i === 1 || i >= 3;
-}
+  // VIP nunca vê cadeado
+  if (isVIP) return false;
 
+  // usuário comum só libera durante a sessão
+  if (sessionUnlocked) return false;
+
+  return true;
+}
 /* ===== CONTADOR ONLINE DINÂMICO ===== */
 let onlineCount = Math.floor(Math.random() * 80000) + 115456;
 const onlineEl = document.getElementById("online");
@@ -611,30 +799,48 @@ musicBtn.onclick=()=>{
 function render(){
   list.innerHTML = "";
 
-const showVIP = localStorage.getItem("showVIP") === "true";
+  const isPwaUser = isPWA();
 
- if (isVIP) {
-   const vipUser = document.createElement("div");
-   vipUser.className = "vip-user";
-   vipUser.innerText = `👑 ${userName} • MEMBRO VIP 👑`;
-   list.appendChild(vipUser);
+  if (isVIP) {
+    const vipUser = document.createElement("div");
+    vipUser.className = "vip-user";
+    vipUser.innerText = `👑 ${userName} • MEMBRO VIP 👑`;
+    list.appendChild(vipUser);
 
-}  else if (showVIP) {
-   const vipItem = document.createElement("a");
-   vipItem.href = "vip.html";
-   vipItem.className = "vip-call";
-   vipItem.innerHTML = `
-  <div class="vip-cta-top">
-    (CLIQUE AQUI 👇👇)
-  </div>
-  <div class="vip-cta-main">
-    SEJA UM MEMBRO VIP POR APENAS 10 REAIS
-  </div>
-`;
-   list.appendChild(vipItem);
-}
-// ❗ sem else → não aparece nada
+  } else if (isPwaUser) {
+    const vipItem = document.createElement("div");
+    vipItem.className = "vip-call";
+    vipItem.innerHTML = `
+      <div class="vip-cta-top">(CLIQUE AQUI 👇👇)</div>
+      <div class="vip-cta-main">🔓 DESTRAVAR TÓPICOS</div>
+    `;
 
+    vipItem.onclick = () => {
+      const locks = document.querySelectorAll(".lock");
+
+      const totalDuration = 2000;
+      const delay = totalDuration / locks.length;
+
+      locks.forEach((lock, index) => {
+        setTimeout(() => {
+          lock.classList.add("explode");
+        }, index * delay);
+      });
+
+      setTimeout(() => {
+        render();
+
+        document
+          .getElementById("vipOfferOverlay")
+          .classList.remove("hidden");
+
+      }, totalDuration + 150);
+    };
+
+    list.appendChild(vipItem);
+  }
+
+  // ✅ AGORA FORA DO IF — SEMPRE EXECUTA
   topics.forEach((t,i)=>{
     const opened = localStorage.getItem("opened_"+i);
     const blocked = !isVIP && isBlocked(i);
@@ -653,14 +859,13 @@ const showVIP = localStorage.getItem("showVIP") === "true";
 
     left.appendChild(emoji);
 
-    /* TEXTO DO TÓPICO */
     const text = document.createElement("span");
     text.innerText = t;
     left.appendChild(text);
 
-    /* 🔒 CADEADO VIP */
     if(blocked){
       const lock = document.createElement("span");
+      lock.className = "lock";
       lock.innerText = " 🔒";
       lock.style.opacity = "0.8";
       lock.style.fontSize = "15px";
@@ -670,22 +875,19 @@ const showVIP = localStorage.getItem("showVIP") === "true";
     div.appendChild(left);
 
     if(!opened){
-      badge = document.createElement("div");
+      const badge = document.createElement("div");
       badge.className = "badge";
       badge.innerText = "+99";
       div.appendChild(badge);
-     }
-
+    }
 
     div.onclick = () =>{
-  if(blocked){
-    showOverlay();
-    return;
-  }
-
-  localStorage.setItem("showVIP", "true"); // 👈 ADICIONE ISSO
-  openTopic(i);
-};
+      if(blocked){
+        showOverlay();
+        return;
+      }
+      openTopic(i);
+    };
 
     list.appendChild(div);
   });
@@ -910,9 +1112,9 @@ window.addEventListener("beforeinstallprompt", (e) => {
   deferredPrompt = e;
 
   // mostra botão fixo se não estiver instalado
-  if (!isAppInstalled()) {
-    installFixedBtn.classList.remove("hidden");
-  }
+  if (localStorage.getItem("appInstalled") !== "true") {
+  document.getElementById("installCornerBtn").classList.remove("hidden");
+}
 });
 
 window.addEventListener("load", () => {
@@ -993,7 +1195,7 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 
-let deferredPrompt = null;
+var deferredPrompt = null;
 const cornerBtn = document.getElementById("installCornerBtn");
 
 if (localStorage.getItem("appInstalled") === "true") {
@@ -1073,6 +1275,66 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
 }
 
+let jaPagueiTimer = null;
+
+function copyPix(){
+  const pixEl = document.getElementById("vipPixCode");
+  if (!pixEl || !pixEl.innerText) return;
+
+  navigator.clipboard.writeText(pixEl.innerText);
+  alert("✅ Código Pix copiado");
+
+  if (jaPagueiTimer) return;
+
+  jaPagueiTimer = setTimeout(() => {
+    const btn = document.getElementById("vipCheckBtn");
+    const hint = document.getElementById("vipCheckHint");
+
+    if (btn) btn.classList.remove("hidden");
+    if (hint) hint.classList.remove("hidden");
+  }, 24000);
+} // 👈 FECHAMENTO QUE ESTAVA FALTANDO
+
+async function checarPagamento(){
+  if (!paymentId) {
+    alert("Nenhum pagamento em andamento.");
+    return;
+  }
+
+  // 🔥 FEEDBACK IMEDIATO
+  const btn = document.getElementById("vipCheckBtn");
+  btn.innerText = "⏳ Verificando pagamento...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(
+      `https://pix-backend-cfok.onrender.com/status/${paymentId}`
+    );
+
+    const data = await res.json();
+
+    if (data.status === "approved") {
+      alert("🎉 Pagamento confirmado! Acesso liberado.");
+
+      localStorage.setItem("isVIP", "true");
+      sessionUnlocked = true;
+      render();
+
+
+      location.reload();
+    } else {
+      alert("⏳ Pagamento ainda não confirmado. Tente novamente em alguns segundos.");
+    }
+
+  } catch (e) {
+    alert("❌ Erro ao verificar pagamento.");
+  } finally {
+    // 🔄 RESTAURA BOTÃO
+    btn.innerText = "✅ Já paguei";
+    btn.disabled = false;
+  }
+}
+
 // 🔥 REGISTRA APENAS SE NÃO FOR VIP
 window.addEventListener("load", () => {
   if (localStorage.getItem("isVIP") !== "true") {
@@ -1102,6 +1364,112 @@ function getFixedVideoTime(topicIndex, msgIndex) {
 }
 </script>
 
+<!-- OVERLAY CONVERSÃO VIP -->
+<div id="vipOfferOverlay" class="vip-offer-overlay hidden">
+  <div class="vip-offer-box">
+    <h2 class="vip-offer-title">
+  <span class="labia">Labia</span>
+  <span class="extrema">Extrema</span>
+  <svg class="verify" viewBox="0 0 24 24" fill="#1DA1F2" style="vertical-align:middle">
+    <path d="M22.5 12l-2.3 2.7.3 3.5-3.4.8-1.8 3-3.3-1.3-3.3 1.3-1.8-3-3.4-.8.3-3.5L1.5 12l2.3-2.7-.3-3.5 3.4-.8 1.8-3 3.3 1.3 3.3-1.3 1.8 3 3.4.8-.3 3.5L22.5 12z"/>
+    <path d="M10.5 15.5l-3-3 1.4-1.4 1.6 1.6 4.1-4.1 1.4 1.4z" fill="#fff"/>
+  </svg>
+</h2>
 
+    <p class="vip-offer-text">
+      Aqui temos conteúdos <b>atualizados todos os dias</b> para manter o app
+      funcionando, evoluir a plataforma e garantir as manutenções.
+      <br><br>
+      Cobramos apenas um <b>pequeno valor simbólico de R$10</b> para acesso
+      <b>VIP completo e vitalício!!</b>.
+      <br><br>
+      <i>Quem entra aqui não paga. <br>Investe em si mesmo.</i>
+    </p>
+
+    <button id="vipJoinBtn" class="vip-offer-btn">
+      💎 QUERO ENTRAR
+    </button>
+
+<div id="vipPayment" class="vip-payment hidden">
+  <img id="vipQr" />
+
+  <div class="vip-pix-code" id="vipPixCode"></div>
+
+  <div class="vip-auto-release">
+    ⚡ Seu acesso será liberado na hora após a confirmação do pagamento.<br>
+    <b>100% automático.</b>
+  </div>
+
+  <button id="copyPixBtn" class="copy-btn">
+  📋 Copiar código Pix
+ </button>
+
+  <!-- 👇 FRASE DE APOIO -->
+  <div class="vip-check-hint hidden" id="vipCheckHint">
+    Caso o acesso não seja liberado automaticamente após o pagamento,
+    clique em <b>“Já paguei”</b> para liberar instantaneamente.
+  </div>
+
+  <button
+    id="vipCheckBtn"
+    class="copy-btn hidden"
+    style="background:#0a8f3c; margin-top:6px"
+  >
+    ✅ Já paguei
+  </button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const joinBtn = document.getElementById("vipJoinBtn");
+  if (joinBtn) {
+    joinBtn.onclick = gerarPixReal;
+  }
+});
+async function gerarPixReal() {
+  const qrImg = document.getElementById("vipQr");
+  const pixEl = document.getElementById("vipPixCode");
+  const payBox = document.getElementById("vipPayment");
+  const checkBtn = document.getElementById("vipCheckBtn");
+if (checkBtn) {
+  checkBtn.classList.add("hidden");
+}
+
+const hint = document.getElementById("vipCheckHint");
+if (hint) hint.classList.add("hidden");
+
+jaPagueiTimer = null;
+
+  qrImg.src = "";
+  pixEl.innerText = "Gerando PIX...";
+
+  try {
+    const res = await fetch("https://pix-backend-cfok.onrender.com/gerar-pix", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!res.ok) throw new Error("Erro backend");
+
+    const data = await res.json();
+
+    paymentId = data.paymentId;
+
+    qrImg.src = `data:image/png;base64,${data.qrBase64}`;
+    pixEl.innerText = data.qr;
+
+    payBox.classList.remove("hidden");
+
+  } catch (e) {
+    pixEl.innerText = "❌ Erro ao gerar PIX. Tente novamente.";
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const copyBtn = document.getElementById("copyPixBtn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", copyPix);
+  }
+});
+</script>
 </body>
 </html>
