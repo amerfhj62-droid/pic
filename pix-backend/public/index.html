@@ -1390,33 +1390,62 @@ function urlBase64ToUint8Array(base64String) {
 
 let jaPagueiTimer = null;
 
-function copyPix(){
+function copyPix() {
   const pixEl = document.getElementById("vipPixCode");
-  if (!pixEl || !pixEl.innerText) return;
+  if (!pixEl || !pixEl.innerText) {
+    alert("❌ Código Pix indisponível");
+    return;
+  }
 
-  navigator.clipboard.writeText(pixEl.innerText);
-  alert("✅ Código Pix copiado");
+  const text = pixEl.innerText.trim();
 
+  // 📱 fallback universal (iOS, Android, PWA)
+  const tempInput = document.createElement("textarea");
+  tempInput.value = text;
+  tempInput.style.position = "fixed";
+  tempInput.style.opacity = "0";
+  document.body.appendChild(tempInput);
+
+  tempInput.focus();
+  tempInput.select();
+
+  let copied = false;
+
+  try {
+    copied = document.execCommand("copy");
+  } catch (e) {
+    copied = false;
+  }
+
+  document.body.removeChild(tempInput);
+
+  if (copied) {
+    alert("✅ Código Pix copiado!");
+  } else {
+    alert("❌ Não foi possível copiar automaticamente.\n\nToque e segure o código para copiar manualmente.");
+  }
+
+  // ⏱️ inicia o timer do “Já paguei”
   if (jaPagueiTimer) return;
 
   jaPagueiTimer = setTimeout(() => {
-  const btn = document.getElementById("vipCheckBtn");
-  const hint = document.getElementById("vipCheckHint");
+    const btn = document.getElementById("vipCheckBtn");
+    const hint = document.getElementById("vipCheckHint");
 
-  if (btn) btn.classList.remove("hidden");
-  if (hint) hint.classList.remove("hidden");
+    if (btn) btn.classList.remove("hidden");
+    if (hint) hint.classList.remove("hidden");
 
-  // 👇 SCROLL AUTOMÁTICO PARA O NOVO BOTÃO
-  setTimeout(() => {
-    if (btn) {
-  btn.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-  }, 200);
+    setTimeout(() => {
+      if (btn) {
+        btn.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }
+    }, 200);
 
-}, 24000);
-  // 👈 FECHAMENTO QUE ESTAVA FALTANDO
+  }, 24000);
+}
 
 async function checarPagamento(){
   if (!paymentId) {
