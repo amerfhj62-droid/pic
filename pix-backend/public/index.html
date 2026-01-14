@@ -616,6 +616,9 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
     height: 220px;
   }
 }
+.vip-offer-box{
+  padding-bottom: 40px; /* 👈 espaço extra no fim */
+}
 </style>
 </head>
 
@@ -1228,10 +1231,14 @@ window.addEventListener("load", () => {
 
   if(!dismissed){
     setTimeout(() => {
-      document
-        .getElementById("installOverlay")
-        .classList.remove("hidden");
-    }, 3000);
+  const copyBtn = document.getElementById("copyPixBtn");
+  if (copyBtn) {
+    copyBtn.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+}, 300);
   }
 });
 
@@ -1393,12 +1400,22 @@ function copyPix(){
   if (jaPagueiTimer) return;
 
   jaPagueiTimer = setTimeout(() => {
-    const btn = document.getElementById("vipCheckBtn");
-    const hint = document.getElementById("vipCheckHint");
+  const btn = document.getElementById("vipCheckBtn");
+  const hint = document.getElementById("vipCheckHint");
 
-    if (btn) btn.classList.remove("hidden");
-    if (hint) hint.classList.remove("hidden");
-  }, 24000);
+  if (btn) btn.classList.remove("hidden");
+  if (hint) hint.classList.remove("hidden");
+
+  // 👇 SCROLL AUTOMÁTICO PARA O NOVO BOTÃO
+  setTimeout(() => {
+    if (btn) {
+  btn.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+  }, 200);
+
+}, 24000);
 } // 👈 FECHAMENTO QUE ESTAVA FALTANDO
 
 async function checarPagamento(){
@@ -1544,15 +1561,6 @@ async function gerarPixReal() {
 if (checkBtn) {
   checkBtn.classList.add("hidden");
 }
-setTimeout(() => {
-  const box = document.querySelector(".vip-offer-box");
-  if (box) {
-    box.scrollTo({
-      top: box.scrollHeight,
-      behavior: "smooth"
-    });
-  }
-}, 300);
 
 
 const hint = document.getElementById("vipCheckHint");
@@ -1579,6 +1587,12 @@ jaPagueiTimer = null;
     pixEl.innerText = data.qr;
 
     payBox.classList.remove("hidden");
+    setTimeout(() => {
+  payBox.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}, 300);
 
   } catch (e) {
     pixEl.innerText = "❌ Erro ao gerar PIX. Tente novamente.";
