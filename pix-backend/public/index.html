@@ -565,6 +565,48 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
   opacity: 0.9;
   text-align: center;
 }
+
+.installing-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  z-index: 9999;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  animation: slideUp .3s ease;
+}
+
+.installing-bar.hidden {
+  display: none;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.vip-ready-text{
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+  color: #ffd700;
+  text-shadow: 1px 1px 2px #000;
+}
 </style>
 </head>
 
@@ -574,17 +616,23 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
 <div id="overlay" onclick="closeOverlay()">
   <div class="overlay-box" onclick="event.stopPropagation()">
     <img src="logooverlay.png" class="overlay-logo">
-    <div class="overlay-title">
+
+    <div class="overlay-title" id="overlayTitle">
       <span class="labia">Labia</span>
       <span class="extrema">Extrema</span>
     </div>
-      <div class="overlay-text">
-       📲 O acesso completo está disponível no app.<br>
-       Instale agora e desbloqueie todos os tópicos imediatamente.
-      </div>
 
-     <div class="button" onclick="installFromOverlay()">
-     📲 Instalar App
+    <div class="overlay-text" id="overlayText">
+      ✱ O acesso completo está disponível no app.<br>
+      Instale agora e desbloqueie todos os tópicos imediatamente.
+    </div>
+
+    <div
+      class="button"
+      id="overlayInstallBtn"
+      onclick="installFromOverlay()"
+    >
+      📲 Instalar App
     </div>
   </div>
 </div>
@@ -670,15 +718,29 @@ let paymentId = null;
 // quando fecha aba / app
 window.addEventListener("beforeunload", notifyExit);
 
-function installFromOverlay(){
-  // fecha o overlay
-  closeOverlay();
+function showInstallingBar(){
+  document
+    .getElementById("installingBar")
+    .classList.remove("hidden");
+}
 
-  // se o prompt de instalação estiver disponível
+function hideInstallingBar(){
+  document
+    .getElementById("installingBar")
+    .classList.add("hidden");
+}
+
+function installFromOverlay(){
+
   if (deferredPrompt) {
+    closeOverlay();
+    showInstallingBar();
+
     deferredPrompt.prompt();
 
     deferredPrompt.userChoice.then(choice => {
+      hideInstallingBar();
+
       if (choice.outcome === "accepted") {
         localStorage.setItem("appInstalled", "true");
 
@@ -688,11 +750,41 @@ function installFromOverlay(){
     });
 
     deferredPrompt = null;
+
   } else {
-    // fallback (iOS / Safari)
+    hideInstallingBar();
     document
       .getElementById("installOverlay")
       .classList.remove("hidden");
+  }
+}
+
+function updateOverlayForContext() {
+  const title = document.getElementById("overlayTitle");
+  const text = document.getElementById("overlayText");
+  const installBtn = document.getElementById("overlayInstallBtn");
+
+  if (!title || !text || !installBtn) return;
+
+  if (isPWA()) {
+    // Dentro do app
+    title.innerHTML = "🔓 Quase lá!";
+    text.innerHTML = "Clique em <b>Destravar Tópicos</b> para continuar.";
+
+    installBtn.style.display = "none";
+  } else {
+    // Navegador
+    title.innerHTML = `
+      <span class="labia">Labia</span>
+      <span class="extrema">Extrema</span>
+    `;
+
+    text.innerHTML = `
+      ✱ O acesso completo está disponível no app.<br>
+      Instale agora e desbloqueie todos os tópicos imediatamente.
+    `;
+
+    installBtn.style.display = "flex";
   }
 }
 // quando minimiza ou troca de app (mobile)
@@ -753,8 +845,13 @@ const list=document.getElementById("list");
 
 const chat=document.getElementById("chat");
 const overlay=document.getElementById("overlay");
+document.getElementById("overlay").classList.remove("hidden");
+updateOverlayForContext();
 
-function showOverlay(){overlay.classList.add("show")}
+function showOverlay(){
+  overlay.classList.add("show");
+  updateOverlayForContext();
+}
 function closeOverlay(){overlay.classList.remove("show")}
 function isBlocked(i){
   // VIP nunca vê cadeado
@@ -1376,6 +1473,10 @@ function getFixedVideoTime(topicIndex, msgIndex) {
   </svg>
 </h2>
 
+<div class="vip-ready-text">
+  TUDO PRONTO!!🤝
+</div>
+
     <p class="vip-offer-text">
       Aqui temos conteúdos <b>atualizados todos os dias</b> para manter o app
       funcionando, evoluir a plataforma e garantir as manutenções.
@@ -1470,6 +1571,15 @@ document.addEventListener("DOMContentLoaded", () => {
     copyBtn.addEventListener("click", copyPix);
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  sendVisitMetric();
+});
+
 </script>
+<div id="installingBar" class="installing-bar hidden">
+  <span>📲 Instalando o app…</span>
+  <span class="dots">⏳</span>
+</div>
 </body>
 </html>
