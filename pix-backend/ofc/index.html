@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grupo — Tópicos</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --header-blue:#6ea0c7;
+    --subtle:#9fb0bf;
+    --sep: rgba(0,0,0,0.06);
+  }
+
+  html,body{
+    height:100%;margin:0;background:var(--bg);
+    font-family:"Segoe UI",Roboto,Arial,sans-serif;color:#111;
+  }
+
+  .phone {
+    max-width:420px;margin:14px auto;
+    height:calc(100vh - 28px);
+    background:#f9fbfe;border-radius:12px;
+    box-shadow:0 18px 45px rgba(10,20,30,0.15);
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+
+  header.appbar{
+    height:64px;background:var(--header-blue);color:#fff;
+    display:flex;align-items:center;gap:12px;padding:8px 12px;
+  }
+
+  .avatar{width:44px;height:44px;border-radius:8px;overflow:hidden;}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+
+  .hdr-title{font-weight:800;font-size:1.03rem;}
+  .hdr-sub{font-size:0.80rem;opacity:.92;margin-top:2px;font-style:italic;}
+
+  .hdr-right{margin-left:auto;display:flex;gap:10px;}
+  .icon-btn{
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:1.4rem;cursor:pointer;
+  }
+
+  .list{flex:1;overflow:auto;background:var(--panel);padding:6px 0;}
+
+  .topic{
+    display:flex;gap:12px;padding:12px 14px;
+    border-bottom:1px solid var(--sep);
+    opacity:0;transform:translateY(8px);
+    transition:.45s ease;cursor:pointer;
+  }
+  .topic.enter{opacity:1;transform:translateY(0);}
+
+  .left{width:44px;display:flex;align-items:center;justify-content:center;}
+  .circle{
+    width:42px;height:42px;border-radius:10px;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:21px;box-shadow:0 1px 0 rgba(0,0,0,0.03);
+  }
+
+  .body{flex:1;min-width:0}
+  .row1{display:flex;align-items:center;gap:8px}
+  .title{font-size:1.02rem;font-weight:700}
+  .subtitle{
+    margin-top:6px;color:var(--subtle);font-size:0.89rem;
+    opacity:.96;font-style:italic;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+  }
+
+  .right-stack{
+    margin-left:auto;display:flex;flex-direction:column;
+    align-items:flex-end;gap:4px;
+  }
+  .date-right{
+    font-size:0.72rem;color:var(--subtle);
+    text-transform:uppercase;font-weight:700;letter-spacing:.6px;
+  }
+
+  .badge-right{
+    background:#25d366;color:white;font-size:0.78rem;font-weight:700;
+    padding:4px 10px;border-radius:999px;
+    box-shadow:0 4px 10px rgba(37,211,102,0.12);
+  }
+
+  /* ---------------- OVERLAY ---------------- */
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease;
+  }
+
+  #overlay.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .overlay-box {
+    background: rgba(255,255,255,0.08);
+    padding: 28px 22px;
+    width: 85%;
+    max-width: 340px;
+    border-radius: 16px;
+    text-align: center;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.4);
+  }
+
+  .overlay-logo {
+    width: 86px;
+    height: 86px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 3px solid rgba(255,255,255,0.18);
+    object-fit: cover;
+  }
+
+  .overlay-title {
+    font-size: 1.55rem;
+    font-style: italic;
+    font-weight: 900;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 3px black;
+  }
+
+  .overlay-title .labia { color: #ff2222; }
+  .overlay-title .extrema { color: #ffffff; }
+
+  .overlay-text {
+    font-size: 1rem;
+    margin-bottom: 18px;
+    color: #e7e7e7;
+    line-height: 1.4;
+  }
+
+  .cta-btn {
+    background: #2a8cff;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 1.07rem;
+    font-weight: 700;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 0 15px rgba(42,140,255,0.55);
+    animation: pulseBlue 1.3s infinite ease-in-out;
+  }
+
+  @keyframes pulseBlue {
+    0% { box-shadow:0 0 8px rgba(42,140,255,0.55); transform:scale(1); }
+    50% { box-shadow:0 0 20px rgba(42,140,255,0.85); transform:scale(1.03); }
+    100% { box-shadow:0 0 8px rgba(42,140,255,0.55); transform:scale(1); }
+  }
+
+</style>
+</head>
+
+<body>
+<div class="phone">
+
+  <header class="appbar">
+    <div class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+      viewBox="0 0 24 24" fill="none" stroke="white"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </div>
+
+    <div class="avatar"><img src="https://files.catbox.moe/3jvcid.jpg"></div>
+
+    <div>
+      <div class="hdr-title">👑🧠Lábia Extrema</div>
+      <div class="hdr-sub" id="membersCounter">135.895 membros</div>
+    </div>
+
+    <div class="hdr-right">
+      <div class="icon-btn">🔍</div>
+      <div class="icon-btn">⋮</div>
+    </div>
+  </header>
+
+  <main class="list" id="topicsList"></main>
+
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay">
+  <div class="overlay-box">
+    <img class="overlay-logo" src="https://files.catbox.moe/3jvcid.jpg">
+
+    <div class="overlay-title">
+      <span class="labia">Lábia</span> <span class="extrema">Extrema</span>
+    </div>
+
+    <div class="overlay-text">
+      Você ainda não faz parte do grupo<br>
+      clique pra entrar
+    </div>
+
+    <a class="cta-btn" href="https://t.me/vipszada_bot" target="_blank">Entrar no Grupo</a>
+  </div>
+</div>
+
+<script>
+/* contador membros */
+let currentMembers = 135895;
+setInterval(()=>{
+  currentMembers += 3;
+  const el = document.getElementById("membersCounter");
+  el.textContent = currentMembers.toLocaleString("pt-BR")+" membros";
+  el.style.transform="scale(1.07)";
+  setTimeout(()=> el.style.transform="scale(1)", 200);
+},1500);
+
+/* ------ tópicos com badges fixas ------ */
+
+const topics = [
+  {icon:'🔞', title:'O Que Evitar nas Primeiras Conversas', subtitle:'Acesso Vip: 💬 🧳 LEI 33 — TENTAR AD...', badge:245},
+  {icon:'🔥', title:'Sinais de Interesse Feminino', subtitle:'Acesso Vip: 💬 💋 SINAL 50 — Ela te a...', badge:157},
+  {icon:'🗣️', title:'Comunicação Assertiva', subtitle:'Acesso Vip: 💬 🧳 LEI 27 — NÃO PEÇA...', badge:856},
+  {icon:'🏴‍☠️', title:'Superando a Rejeição', subtitle:'Acesso Vip: 💬 🧳 LEI 27 — A VIDA PR...', badge:456},
+  {icon:'🍔', title:'A Hora Certa de Chamar pra Sair', subtitle:'Acesso Vip: 💬 🧳 LEI 21 — O MOMENT...', badge:254},
+  {icon:'❗', title:'Evitando Conversas Forçadas', subtitle:'Acesso Vip: 💬 🧳 LEI 27 — A NATURA...', badge:312},
+  {icon:'👄', title:'Conversas que Criam Conexão', subtitle:'Acesso Vip: 💬 🧳 LEI 26 — FECHAR CO...', badge:198},
+  {icon:'🎭', title:'Linguagem Corporal', subtitle:'Acesso Vip: 💬 🧳 LEI 99 — AQUIETAR...', badge:627},
+  {icon:'🏆', title:'Autoconfiança Masculina', subtitle:'Acesso Vip: 💬 🧳 LEI 99 — NÃO SE TR...', badge:403},
+  {icon:'‼️', title:'Quebrando a Vergonha', subtitle:'Acesso Vip: 🔥 Insight: Ninguém confi...', badge:276},
+  {icon:'🔥', title:'Conteúdo Proibido em +24 países', subtitle:'Você: Tópico renomeado', badge:512},
+  {icon:'🚫', title:'Manipulação Obscura', subtitle:'Você: Tópico renomeado', badge:689},
+  {icon:'📩', title:'Puxando Assunto nas Redes Sociais', subtitle:'Acesso Vip: 💬💬 “O universo ma...”', badge:341},
+  {icon:'📈', title:'Mentor Particular', subtitle:'O tópico 📈🧠😎 Mentor Particular...', badge:734},
+  {icon:'📅', title:'Desafios Semanais', subtitle:'Acesso Vip: 💬🏆 DESAFIO 33 — CUMP...', badge:288},
+  {icon:'📈', title:'Evolução Pessoal e Social', subtitle:'Acesso Vip: 💬 🧳 LEI 33 — NUNCA PA...', badge:159},
+];
+
+const list = document.getElementById("topicsList");
+const overlay = document.getElementById("overlay");
+
+topics.forEach((t,i)=>{
+  const art = document.createElement("article");
+  art.className="topic";
+
+  art.innerHTML = `
+    <div class="left"><div class="circle"><span>${t.icon}</span></div></div>
+    <div class="body">
+      <div class="row1">
+        <div class="title">${t.title}</div>
+        <div class="right-stack">
+          <div class="date-right">HOJE • 18:22</div>
+          <div class="badge-right">${t.badge}</div>
+        </div>
+      </div>
+      <div class="subtitle">${t.subtitle}</div>
+    </div>
+  `;
+
+  setTimeout(()=> art.classList.add("enter"), i*80);
+
+  /* clique abre overlay */
+  art.addEventListener("click",()=>{
+    overlay.classList.add("show");
+  });
+
+  list.appendChild(art);
+});
+
+/* fechar overlay clicando fora (se quiser) */
+/*
+overlay.addEventListener("click",(e)=>{
+  if(e.target===overlay) overlay.classList.remove("show");
+});
+*/
+</script>
+
+</body>
+</html>
