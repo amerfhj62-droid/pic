@@ -635,16 +635,16 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
     </div>
 
     <div class="overlay-text" id="overlayText">
-      ✱ O acesso completo está disponível no app.<br>
-      Instale agora e desbloqueie todos os tópicos imediatamente.
-    </div>
+  🔒 Este conteúdo está bloqueado.<br>
+  Para continuar, clique em <b>🔓 Destravar Tópicos</b>.
+</div>
 
     <div
       class="button"
       id="overlayInstallBtn"
       onclick="installFromOverlay()"
     >
-      📲 Instalar App
+     
     </div>
   </div>
 </div>
@@ -792,9 +792,9 @@ function updateOverlayForContext() {
     `;
 
     text.innerHTML = `
-      ✱ O acesso completo está disponível no app.<br>
-      Instale agora e desbloqueie todos os tópicos imediatamente.
-    `;
+  🔒 Este conteúdo está bloqueado.<br>
+  Clique em <b>🔓 Destravar Tópicos</b> para continuar.
+`;
 
     installBtn.style.display = "flex";
   }
@@ -916,7 +916,7 @@ function render(){
     vipUser.innerText = `👑 ${userName} • MEMBRO VIP 👑`;
     list.appendChild(vipUser);
 
-  } else if (isPwaUser) {
+  } else {
     const vipItem = document.createElement("div");
     vipItem.className = "vip-call";
     vipItem.innerHTML = `
@@ -1326,9 +1326,16 @@ window.addEventListener("beforeinstallprompt", (e) => {
 
 cornerBtn.addEventListener("click", async () => {
   if (!deferredPrompt) {
-    alert("📲 Use o menu do navegador para instalar o app");
-    return;
-  }
+  alert(
+    "⚠️ ATENÇÃO\n\n" +
+    "O navegador do Instagram NÃO permite instalar apps.\n\n" +
+    "👉 Para instalar corretamente:\n" +
+    "1️⃣ Toque nos três pontinhos (⋮) no canto da tela\n" +
+    "2️⃣ Selecione: \"Abrir no Google Chrome\"\n" +
+    "3️⃣ e instale o app normalmente 📲\n\n" +
+  );
+  return;
+}
 
   deferredPrompt.prompt();
   const result = await deferredPrompt.userChoice;
@@ -1536,7 +1543,7 @@ function getFixedVideoTime(topicIndex, msgIndex) {
       Aqui temos conteúdos <b>atualizados todos os dias</b> para manter o app
       funcionando, evoluir a plataforma e garantir as manutenções.
       <br><br>
-      Cobramos apenas um <b>pequeno valor simbólico de R$10</b> para acesso
+      Cobramos apenas um <b>pequeno valor simbólico de R$2,50</b> para acesso
       <b>VIP completo e vitalício!!</b>.
       <br><br>
       <i>Quem entra aqui não paga. <br>Investe em si mesmo.</i>
