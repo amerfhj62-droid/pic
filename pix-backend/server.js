@@ -145,7 +145,7 @@ app.get("/conteudo", (req, res) => {
 app.post("/gerar-pix", async (req, res) => {
   try {
     const pagamento = await mercadopago.payment.create({
-      transaction_amount: 10,
+      transaction_amount: 2.5,
       description: "Acesso VIP Lábia Extrema",
       payment_method_id: "pix",
       payer: { email: `user${Date.now()}@email.com` }
@@ -173,7 +173,7 @@ app.post("/criar-pagamento", async (req, res) => {
       items: [{
         title: "Acesso VIP Lábia Extrema",
         quantity: 1,
-        unit_price: 10
+        unit_price: 2.5
       }],
        back_urls: {
        success: `${BASE_URL}/vip.html`,
