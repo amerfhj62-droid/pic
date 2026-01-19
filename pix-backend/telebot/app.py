@@ -76,23 +76,25 @@ MAIN_TEXT = """
 🔱 Aqui eu te ensino:
 🔞 Como se comportar.
 🔞 Como falar perto dela.
-😈 O que falar pra ela.
-❤️‍🔥 Psicologia que ativa desejo feminino.
-😈 E muito mais...
+😈Oque Falar Pra Ela..
+❤️‍🔥A psicologia por trás dos perfumes que acende desejos nas mentes femininas.
+😈
+E muito mais...
 
 ⚠️ Usando:
 ⚜ Psicologia Obscura
-🌀 Manipulação Emocional
+🌀 Manipulação Emocional 🚷
 🧠 Neurolinguística
-📘 Persuasão
-🏹 Elogios Subjetivos
+📘 Princípios de Persuasão
+🏹 Elaboração de Elogios Subjetivos
+⚠️ Temos Conteúdos proibidos em +24 países 
+etc..
+📲 2Mil Mensagens Prontas Baseadas em Psicologia e Manipulação, Faz ela responder na mesma hora.🔞
 
-📲 2.000 mensagens prontas que fazem ela responder na hora.
+🔥Faça Qualquer Pessoa Comer Na sua mão. E Ficar Louca pra te dar,😈🔞
 
-🔥 Para manter tudo funcionando,
-o acesso exige um valor simbólico de R$10.
-Quem entra aqui não paga — investe em si mesmo.
-"""
+Para manter tudo funcionando e Ajudar nas Manutenções, cobramos apenas um valor simbólico de R$10.
+Quem entra aqui não paga… investe em si mesmo🔞 """
 
 # ===================== PLANO =====================
 PLANS = {
