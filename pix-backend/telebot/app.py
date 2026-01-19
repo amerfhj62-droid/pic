@@ -72,9 +72,7 @@ Aqui não existe Gados — só homens que Pegam Mulheres, Facil.💪
 Isso não é grátis. O acesso custa R$10 — e existe um motivo pra isso.
 """
 
-MAIN_TEXT = """ 🜂 ⚛ Bem-vindo à irmandade mais foda do Brasil.
-Aqui não existe Gados — só homens que Pegam Mulheres, Facil.💪
-
+MAIN_TEXT = """
 🔱 Aqui eu te ensino:
 🔞 Como se comportar.
 🔞 Como falar perto dela.
