@@ -186,14 +186,14 @@ async def button(update: Update, context):
 
     if q.data == "why_not_free":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔓 Liberar acesso", callback_data="confirm")]
+            [InlineKeyboardButton("🔥 Quero Entrar!!", callback_data="confirm")]
         ])
         await q.message.reply_text(MAIN_TEXT, reply_markup=keyboard)
         return
 
     if q.data == "confirm":
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔥 Eu jogo sério", callback_data="pay")],
+            [InlineKeyboardButton("🔥 Liberar Acesso!", callback_data="pay")],
             [InlineKeyboardButton("❌ Vou sair", callback_data="exit")]
         ])
         await q.message.reply_text(
