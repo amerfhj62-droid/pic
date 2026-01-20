@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#0b0b0e;
+  --card:#141418;
+  --accent:#b30000;
+  --gold:#cfa43b;
+  --text:#ffffff;
+  --muted:#9a9a9a;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Arial;
+  background:linear-gradient(160deg,#09090c,#0e0e14);
+  color:var(--text);
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:28px;
+}
+
+header h1{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:.5px;
+}
+
+header span{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+  margin-bottom:28px;
+}
+
+.card{
+  background:linear-gradient(180deg,#141418,#0f0f13);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.card .label{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.card .value{
+  font-size:30px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.card .sub{
+  font-size:12px;
+  margin-top:4px;
+  color:#6aff9d;
+}
+
+.card.red .sub{color:#ff6a6a}
+.card.gold .value{color:var(--gold)}
+
+.section{
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:20px;
+}
+
+.panel{
+  background:var(--card);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+
+.panel h2{
+  margin:0 0 16px;
+  font-size:18px;
+  font-weight:800;
+}
+
+select,textarea,button{
+  width:100%;
+  border:none;
+  outline:none;
+  border-radius:12px;
+  padding:12px;
+  font-size:14px;
+}
+
+select,textarea{
+  background:#0f0f14;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+textarea{
+  min-height:220px;
+  resize:vertical;
+}
+
+button{
+  margin-top:12px;
+  background:linear-gradient(135deg,#b30000,#ff3333);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{transform:translateY(-1px)}
+
+.chart{
+  height:200px;
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  margin-top:12px;
+}
+
+.bar{
+  flex:1;
+  background:linear-gradient(180deg,#ff4444,#b30000);
+  border-radius:6px 6px 0 0;
+  animation:grow .6s ease forwards;
+}
+
+@keyframes grow{
+  from{height:0}
+}
+
+footer{
+  text-align:center;
+  margin-top:30px;
+  font-size:11px;
+  color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div>
+    <h1>📊 Painel Administrativo LÁBIA EXTREMA!</h1>
+
+    <div id="datetime" style="font-size:12px;opacity:.8">
+      <span id="date"></span>
+      •
+      <span id="br-time"></span>
+    </div>
+  </div>
+</header>
+
+<!-- MÉTRICAS -->
+<div class="grid">
+  <div class="card">
+    <div class="label">👥 Visitas Totais</div>
+    <div id="total" class="value">0</div>
+  </div>
+
+  <div class="card">
+    <div class="label">📅 Hoje</div>
+    <div id="today" class="value">0</div>
+    <div class="sub">atividade diária</div>
+  </div>
+
+  <div class="card">
+    <div class="label">📆 Últimos 7 dias</div>
+    <div id="week" class="value">0</div>
+  </div>
+
+  <div class="card gold">
+    <div class="label">👑 VIPs (local)</div>
+    <div id="vip" class="value">0</div>
+  </div>
+
+  <div class="card red">
+    <div class="label">📈 Conversão</div>
+    <div id="conv" class="value">0%</div>
+  </div>
+
+  <div class="card">
+    <div class="label">⏱️ Tempo médio</div>
+    <div id="time" class="value">0s</div>
+  </div>
+</div>
+
+<!-- CONTEÚDO -->
+<div class="section">
+
+<!-- EDITOR -->
+<div class="panel">
+  <h2>✏️ Editor de Tópicos</h2>
+
+  <select id="topic"></select>
+
+  <textarea id="msg"
+  placeholder="Digite o conteúdo do tópico…
+Use --- para separar mensagens"></textarea>
+
+  <button onclick="save()">Salvar Conteúdo</button>
+</div>
+
+<!-- ACESSO VIP ADMIN -->
+<div class="panel">
+  <h2>🎭 Entrar como VIP (Admin)</h2>
+
+  <button onclick="setVIP(true,'Thiago_Dono!')">
+    👑 Entrar como Thiago Dono
+  </button>
+
+  <button onclick="setVIP(true,'Filipe_DONO')">
+    👑 Entrar como Filipe Dono
+  </button>
+
+  <button onclick="setVIP(false,'Thiago')"
+          style="background:linear-gradient(135deg,#444,#777)">
+    🚫 Entrar como Usuário Normal
+  </button>
+
+  <button onclick="setVIP(true,'VIP')"
+          style="background:linear-gradient(135deg,#cfa43b,#ffda7b);color:#000">
+    ⭐ Entrar como VIP Padrão
+  </button>
+</div>
+
+<!-- GRÁFICO -->
+<div class="panel">
+  <h2>📉 Atividade Semanal</h2>
+  <div id="chart" class="chart"></div>
+</div>
+
+</div>
+
+<footer>
+VAMOS FICAR RICOOO NESSA PORRAAAAA!!! O SEGREDO E CONTINUAR LUTANDO IRMÃO, UMA HORA VAI DAR CERTO!
+</footer>
+
+</div>
+
+<script>
+// 🔐 PROTEÇÃO SIMPLES
+if(prompt("S") !== atob("MzI2NTUyNjA=")){
+  alert("Acesso negado");
+  location.href="/";
+}
+
+function updateBrasiliaDateTime() {
+  const now = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).format(new Date());
+
+  const parts = now.split(" ");
+  const datePart = parts.slice(0, 4).join(" ");
+  const timePart = parts.slice(4).join(" ");
+
+  document.getElementById("date").innerText = datePart;
+  document.getElementById("br-time").innerText =
+    timePart + " (Brasília)";
+}
+
+updateBrasiliaDateTime();
+setInterval(updateBrasiliaDateTime, 1000);
+// ===== TÓPICOS =====
+const topics = [
+  "Evolução Pessoal e Social",
+  "📩📲Puxando Assunto nas Redes Sociais",
+  "🔞10 Frases Proibidas Pra Mandar Pra Ela Agora.🏴‍☠️",
+  "Sinais de Interesse Feminino",
+  "🔞 2 Mil Frases Proibidas Pra Mandar Pra Ela Agora.🏴‍☠️",
+  "Conteúdo Proibido em +24 países📵⚠️",
+  "O Que Evitar nas Primeiras Conversas",
+  "Manipulação Obscura😈",
+  "Comunicação Assertiva",
+  "Superando a Rejeição",
+  "A Hora Certa de Chamar pra Sair",
+  "⚠️📵Evitando Conversas Forçadas",
+  "🔞Conversas que Criam Conexão",
+  "❤️‍🔥👀Linguagem Corporal",
+  "💪🤝Autoconfiança Masculina",
+  "🙈Quebrando a Vergonha",
+  "Desafios Semanais"
+];
+
+const sel=document.getElementById("topic");
+topics.forEach((t,i)=>{
+  sel.innerHTML+=`<option value="${i}">${t}</option>`;
+});
+
+// ===== SALVAR CONTEÚDO =====
+function save(){
+  const i=sel.value;
+  const m=document.getElementById("msg").value;
+  const s=JSON.parse(localStorage.getItem("messages")||"[]");
+  s[i]=m;
+  localStorage.setItem("messages",JSON.stringify(s));
+  alert("Conteúdo salvo com sucesso");
+}
+
+/* =========================
+   MÉTRICAS REAIS (BACKEND)
+========================= */
+
+fetch("/metrics", {
+  headers: {
+    "x-admin-token": "COLOQUE_AQUI_SEU_ADMIN_TOKEN"
+  }
+})
+.then(res => {
+  if (!res.ok) throw new Error("Não autorizado");
+  return res.json();
+})
+.then(data => {
+  document.getElementById("total").innerText = data.total;
+  document.getElementById("today").innerText = data.today;
+  document.getElementById("week").innerText  = data.week;
+  document.getElementById("vip").innerText   = data.vip;
+  document.getElementById("time").innerText  = data.avgTime + "s";
+
+  document.getElementById("conv").innerText =
+    data.total
+      ? ((data.vip / data.total) * 100).toFixed(1) + "%"
+      : "0%";
+})
+.catch(err => {
+  alert("Erro ao carregar métricas");
+  console.error(err);
+});
+
+// ===== GRÁFICO =====
+const chart=document.getElementById("chart");
+for(let i=0;i<7;i++){
+  const h=Math.floor(Math.random()*80)+20;
+  const b=document.createElement("div");
+  b.className="bar";
+  b.style.height=h+"%";
+  chart.appendChild(b);
+}
+
+function setVIP(isVip, name){
+  localStorage.setItem("isVIP", String(isVip));
+  localStorage.setItem("vipName", name);
+
+  // entra no site principal já como VIP
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
