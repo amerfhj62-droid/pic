@@ -749,6 +749,8 @@ const startTime = Date.now();
 function notifyExit() {
   if (localStorage.getItem("isVIP") === "true") return;
 
+  let unlockBtnLiberado = false;
+
   const endpoint = localStorage.getItem("pushEndpoint");
   if (!endpoint) return; // 👈 ESSENCIAL
 
@@ -846,6 +848,7 @@ document.addEventListener("visibilitychange", () => {
 const isVIP = localStorage.getItem("isVIP") === "true";
 const userName = localStorage.getItem("vipName") || "VIP";
 let sessionUnlocked = false;
+let podeMostrarDestravar = false;
 
 function isPWA(){
   return (
@@ -894,14 +897,21 @@ const list=document.getElementById("list");
 
 const chat=document.getElementById("chat");
 const overlay=document.getElementById("overlay");
-document.getElementById("overlay").classList.remove("hidden");
-updateOverlayForContext();
+
 
 function showOverlay(){
   overlay.classList.add("show");
   updateOverlayForContext();
 }
-function closeOverlay(){overlay.classList.remove("show")}
+function closeOverlay(){
+  overlay.classList.remove("show");
+
+  // 🔓 libera o CTA após o "Entendi"
+  if (!podeMostrarDestravar) {
+    podeMostrarDestravar = true;
+    render(); // recria a lista com o CTA agora visível
+  }
+}
 function isBlocked(i){
   // VIP nunca vê cadeado
   if (isVIP) return false;
@@ -953,13 +963,13 @@ function render(){
     vipUser.innerText = `👑 ${userName} • MEMBRO VIP 👑`;
     list.appendChild(vipUser);
 
-  } else {
-    const vipItem = document.createElement("div");
-    vipItem.className = "vip-call";
-    vipItem.innerHTML = `
-      <div class="vip-cta-top">(CLIQUE AQUI 👇👇)</div>
-      <div class="vip-cta-main">🔓 DESTRAVAR TÓPICOS</div>
-    `;
+ } else if (podeMostrarDestravar) {
+  const vipItem = document.createElement("div");
+  vipItem.className = "vip-call";
+  vipItem.innerHTML = `
+    <div class="vip-cta-top">(CLIQUE AQUI 👇👇)</div>
+    <div class="vip-cta-main">🔓 DESTRAVAR TÓPICOS</div>
+  `;
 
     vipItem.onclick = () => {
       const locks = document.querySelectorAll(".lock");
@@ -1573,40 +1583,44 @@ function getFixedVideoTime(topicIndex, msgIndex) {
 </h2>
 
 <div class="vip-ready-text">
-  TUDO PRONTO!!🤝
+  ⚠️ LEIA COM ATENÇÃO
 </div>
 
 <div class="payment-text">
-  🔒 <b>Esse conteúdo NÃO é pra qualquer um.</b><br><br>
+  🔒 <b>Esse conteúdo NÃO é para qualquer homem.</b><br><br>
 
   Aqui estão <b>frases e estratégias</b> que
   <b>funcionam de verdade com mulheres</b> —
   e por isso <b>ficam bloqueadas</b>.<br><br>
 
 <p class="vip-offer-text">
-  O valor real do acesso é
-  <span class="old-price">R$55,00</span>,
-  mas se você entrar agora,
-  paga apenas um
-  <b class="new-price">valor simbólico de R$10,00</b>
-  para ter acesso
-  <b>VIP completo e vitalício!!</b>
+  <b>Mais de 135.000 homens</b> já entraram pagando o valor normal de 
+  <span class="old-price">R$55,00</span>.
+  <br><br>
+
+  Hoje, enquanto esse acesso ainda está liberado,
+  você pode entrar pagando apenas 
+  <b class="new-price">R$10,00</b>
+  para ter acesso <b>VIP completo e vitalício</b>.
+  <br><br>
+
+  <b>Isso não é desconto comum.</b>
+  É uma liberação temporária para novos membros.
+  <br><br>
+
+  ⏳ <b>Quando esse acesso fechar,</b>
+  o valor volta ao normal automaticamente.
 </p>
 
-<div class="urgency-text">
-  ⏰ Essa oferta durou <b>5 dias</b>.<br>
-  <span>Faltam apenas <b id="countdown">13:00</b> para acabar!</span>
-</div>
-
   <b style="color:#ffd700; font-size:1.05rem;">
-    Investir em você não é opcional.
+    Use nossos scripts, mande a mensagem certa e saia com aquela gata ainda hoje.
   </b><br><br>
 
-  Clique abaixo e <b>destrave agora</b>.
+  Clique abaixo e <b>Entre agora</b>.
 </div>
 
     <button id="vipJoinBtn" class="vip-offer-btn">
-      💎 QUERO ENTRAR
+      ✅ LIBERAR MEU ACESSO VIP
     </button>
 
 <div id="vipPayment" class="vip-payment hidden">
