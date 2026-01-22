@@ -1649,8 +1649,11 @@ function getFixedVideoTime(topicIndex, msgIndex) {
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const joinBtn = document.getElementById("vipJoinBtn");
+
   if (joinBtn) {
-    joinBtn.onclick = gerarPixReal;
+    joinBtn.addEventListener("click", () => {
+      window.location.href = "https://pay.kiwify.com.br/eJ9uvFP";
+    });
   }
 });
 async function gerarPixReal() {
@@ -1748,6 +1751,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   update();
   const timer = setInterval(update, 1000);
+})();
+</script>
+
+<script>
+(function () {
+  const VIP_CODE = "vip_access_2026";
+
+  const params = new URLSearchParams(window.location.search);
+  const vipParam = params.get("vip");
+
+  if (vipParam === VIP_CODE) {
+    localStorage.setItem("isVIP", "true");
+
+    // limpa a URL (recomendado)
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+  }
 })();
 </script>
 </body>
