@@ -619,6 +619,43 @@ body{margin:0;font-family:system-ui,Arial;background:#000;display:flex;justify-c
 .vip-offer-box{
   padding-bottom: 40px; /* 👈 espaço extra no fim */
 }
+
+.old-price{
+  color:#ff4d4d;
+  text-decoration: line-through;
+  font-weight: 900;
+  font-size: 15px;
+  margin-right: 4px;
+}
+
+.new-price{
+  color:#00ff88;
+  font-weight: 900;
+}
+
+.urgency-text{
+  margin-top:14px;
+  padding:10px;
+  border-radius:12px;
+  background:rgba(255,0,0,0.08);
+  border:1px solid rgba(255,0,0,0.35);
+  color:#ff3b3b;
+  font-size:13px;
+  font-weight:900;
+  text-align:center;
+}
+
+.vip-pix-intro{
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0,255,100,0.08);
+  border: 1px solid rgba(0,255,100,0.25);
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: #d6ffd6;
+  text-align: center;
+}
 </style>
 </head>
 
@@ -1539,23 +1576,50 @@ function getFixedVideoTime(topicIndex, msgIndex) {
   TUDO PRONTO!!🤝
 </div>
 
-    <p class="vip-offer-text">
-      Aqui temos conteúdos <b>atualizados todos os dias</b> para manter o app
-      funcionando, evoluir a plataforma e garantir as manutenções.
-      <br><br>
-      Cobramos apenas um <b>pequeno valor simbólico de R$2,50</b> para acesso
-      <b>VIP completo e vitalício!!</b>.
-      <br><br>
-      <i>Quem entra aqui não paga. <br>Investe em si mesmo.</i>
-    </p>
+<div class="payment-text">
+  🔒 <b>Esse conteúdo NÃO é pra qualquer um.</b><br><br>
+
+  Aqui estão <b>frases e estratégias</b> que
+  <b>funcionam de verdade com mulheres</b> —
+  e por isso <b>ficam bloqueadas</b>.<br><br>
+
+<p class="vip-offer-text">
+  O valor real do acesso é
+  <span class="old-price">R$55,00</span>,
+  mas se você entrar agora,
+  paga apenas um
+  <b class="new-price">valor simbólico de R$10,00</b>
+  para ter acesso
+  <b>VIP completo e vitalício!!</b>
+</p>
+
+<div class="urgency-text">
+  ⏰ Essa oferta durou <b>5 dias</b>.<br>
+  <span>Faltam apenas <b id="countdown">13:00</b> para acabar!</span>
+</div>
+
+  <b style="color:#ffd700; font-size:1.05rem;">
+    Investir em você não é opcional.
+  </b><br><br>
+
+  Clique abaixo e <b>destrave agora</b>.
+</div>
 
     <button id="vipJoinBtn" class="vip-offer-btn">
       💎 QUERO ENTRAR
     </button>
 
 <div id="vipPayment" class="vip-payment hidden">
-  <img id="vipQr" />
 
+  <div id="vipPixIntro" class="vip-pix-intro">
+    ✅ <b>Falta só 1 passo</b><br>
+    Pague agora e receba o acesso<br>
+    <b>vitalício automaticamente.</b><br><br>
+
+    💰 <b>Valor simbólico:</b> R$ 10,00
+  </div>
+
+  <img id="vipQr" />
   <div class="vip-pix-code" id="vipPixCode"></div>
 
   <div class="vip-auto-release">
@@ -1650,5 +1714,41 @@ document.addEventListener("DOMContentLoaded", () => {
   <span>📲 Instalando o app…</span>
   <span class="dots">⏳</span>
 </div>
+<script>
+(function startCountdown(){
+  const DURATION = 13 * 60; // 5 minutos
+  const key = "vipCountdownEnd";
+
+  let endTime = localStorage.getItem(key);
+
+  if(!endTime){
+    endTime = Date.now() + DURATION * 1000;
+    localStorage.setItem(key, endTime);
+  }
+
+  function update(){
+    const now = Date.now();
+    const diff = Math.max(0, endTime - now);
+
+    const min = String(Math.floor(diff / 60000)).padStart(2,"0");
+    const sec = String(Math.floor((diff % 60000) / 1000)).padStart(2,"0");
+
+    const el = document.getElementById("countdown");
+    if(el){
+      el.innerText = `${min}:${sec}`;
+    }
+
+    if(diff <= 0){
+      clearInterval(timer);
+      if(el){
+        el.innerText = "00:00";
+      }
+    }
+  }
+
+  update();
+  const timer = setInterval(update, 1000);
+})();
+</script>
 </body>
 </html>
